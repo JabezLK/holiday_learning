@@ -222,8 +222,8 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .parent h2{font-size:1.25rem;margin:22px 0 8px}
 .danger{color:var(--no)}
 /* Read-along */
-.w{display:inline-block;border-radius:6px;transition:background-color .12s,transform .12s}
-.w.now{background:var(--star);color:#231a00;box-shadow:0 0 0 3px var(--star);transform:scale(1.08)}
+.w{display:inline-block;border-radius:6px}
+.w.now{background:var(--star);color:#231a00;box-shadow:0 0 0 3px var(--star)}
 .iconbtn.live{background:var(--star);color:#231a00;animation:speak 1s ease-in-out infinite}
 @keyframes speak{50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--star) 35%,transparent)}}
 .vis.talking,.talking{border-radius:14px;background:var(--hintbg);box-shadow:0 0 0 6px var(--hintbg)}
@@ -646,18 +646,24 @@ const normWord=t=>t.replace(/[.,:;!?…]+$/,'').toLowerCase();
 /* Link each cue to the next matching spoken word, in order. Returns one entry per cue; idx -1 means the word was not found. */
 function bindCues(textEl,list,root){const spans=[...textEl.querySelectorAll('.w')];let pos=0;return (list||[]).map(c=>{let idx=-1;for(let i=pos;i<spans.length;i++){if(normWord(spans[i].textContent)===String(c[0]).toLowerCase()){idx=i;pos=i+1;break}}return{span:idx<0?null:spans[idx],idx,only:!!c[2],els:resolveCue(c[1],root),word:c[0]}})}
 function fireCues(r,span){if(!r.cues.length)return;const all=r.spanList||(r.spanList=[...span.parentElement.querySelectorAll('.w')]),at=all.indexOf(span);while(r.cueAt<r.cues.length){const c=r.cues[r.cueAt];if(c.idx<0){r.cueAt++;continue}if(c.idx>at)break;if(c.only)clearLit();c.els.forEach(e=>e.classList.add('lit'));r.cueAt++}}
+const PACE_LS='p1-math-pace';let paceAll={};try{paceAll=JSON.parse(localStorage.getItem(PACE_LS)||'{}')}catch(e){}
+const paceKey=()=>{const v=pickVoice();return v?v.voiceURI:'default'};
+const getPace=()=>paceAll[paceKey()]||1;
+function setPace(x){if(!(x>0))return;paceAll[paceKey()]=Math.min(1.8,Math.max(.4,getPace()*.6+x*.4));try{localStorage.setItem(PACE_LS,JSON.stringify(paceAll))}catch(e){}}
 function playSeg(r){if(r.dead)return;const seg=r.segs[r.i];if(!seg){stopRead(true);return}clearNow();if(seg.glow)seg.glow.classList.add('talking');
-  let done=false,bound=false,timerOn=false;
-  const show=e=>{clearNow();e.classList.add('now');fireCues(r,e)};
-  const runTimer=()=>{if(timerOn||!seg.map.length)return;timerOn=true;let i=0;const step=()=>{if(r.dead||bound||done)return;show(seg.map[i].el);if(i<seg.map.length-1){const ms=seg.map[i].ms;i++;r.tm=setTimeout(step,ms)}};step()};
-  const next=()=>{if(done||r.dead)return;done=true;clearTimeout(r.tm);clearTimeout(r.guard);if(seg.glow)seg.glow.classList.remove('talking');clearNow();r.i++;r.tm=setTimeout(()=>playSeg(r),140)};
+  const map=seg.map;let done=false,started=false,idx=-1,cur=null,startT=0,last=null,sawBound=false;
+  const show=m=>{if(cur)cur.classList.remove('now');cur=m.el;cur.classList.add('now');fireCues(r,cur)};
+  const sum=(a,b)=>{let t=0;for(let i=a;i<b;i++)t+=map[i].ms;return t};
+  const advance=()=>{if(r.dead||done)return;if(idx<map.length-1){idx++;show(map[idx]);if(idx<map.length-1)r.tm=setTimeout(advance,map[idx].ms*getPace())}};
+  const begin=()=>{if(started)return;started=true;startT=performance.now();if(map.length)advance()};
+  const next=()=>{if(done||r.dead)return;done=true;clearTimeout(r.tm);clearTimeout(r.guard);if(started&&map.length>2&&!sawBound)setPace((performance.now()-startT)/seg.est);if(seg.glow)seg.glow.classList.remove('talking');if(cur)cur.classList.remove('now');r.i++;r.tm=setTimeout(()=>playSeg(r),140)};
   try{const u=new SpeechSynthesisUtterance(seg.text);const v=pickVoice();u.lang=v?v.lang:'en-US';if(v)u.voice=v;u.rate=RATE;u.pitch=1;
-    u.onstart=runTimer;
-    u.onboundary=e=>{if(r.dead||done||(e.name&&e.name!=='word'))return;if(!bound){bound=true;clearTimeout(r.tm)}let hit=null;for(const m of seg.map){if(m.at<=e.charIndex)hit=m;else break}if(hit)show(hit.el)};
-    u.onend=next;u.onerror=next;
-    r.guard=setTimeout(next,seg.est*2+5000);
-    setTimeout(()=>{if(!r.dead&&!done)runTimer()},1200);
-    speechSynthesis.speak(u)}catch(e){stopRead()}}
+    u.onstart=begin;
+    u.onboundary=e=>{if(r.dead||done||!map.length||(e.name&&e.name!=='word'))return;begin();sawBound=true;let h=0;map.forEach((m,i)=>{if(m.at<=e.charIndex)h=i});const now=performance.now();
+      if(last&&h>last.i)setPace((now-last.t)/sum(last.i,h));last={t:now,i:h};clearTimeout(r.tm);
+      if(h>=idx){if(h>idx){idx=h;show(map[idx])}if(idx<map.length-1)r.tm=setTimeout(advance,map[idx].ms*getPace())}
+      else if(idx<map.length-1)r.tm=setTimeout(advance,sum(h,idx+1)*getPace())};
+    u.onend=next;u.onerror=next;r.guard=setTimeout(next,seg.est*2.5+5000);setTimeout(()=>{if(!r.dead&&!done)begin()},1200);speechSynthesis.speak(u)}catch(e){stopRead()}}
 function qSegs(q){const out=wordSeg(document.getElementById('qtext')),vis=document.querySelector('.play .card > .vis'),sum=vis&&vis.querySelector('.sum');
   if(sum&&sum.textContent.includes('?'))out.push(...wordSeg(sum));
   else if(q.say&&q.say!==q.q){const x=q.say.startsWith(q.q)?q.say.slice(q.q.length).trim():q.say;if(x)out.push(glowSeg(x,vis||null))}
