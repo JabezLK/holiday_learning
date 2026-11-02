@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Math"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>Holiday Math Line</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Grandstander:wght@600;800&display=swap">
+<style>
+/* Layout concept: a Singapore MRT line map. Each math topic is a station; each set of questions is a ride with a train moving stop to stop. */
+:root{
+  --bg:#eef6fb; --surface:#ffffff; --surface2:#e0edf5; --ink:#10293f; --muted:#4e6579; --hair:#c4d6e2;
+  --red:#d42e12; --amber:#b87a00; --green:#00853f; --purple:#8f2ba8; --blue:#0a62c4;
+  --ok:#00803c; --okbg:#dcf5e5; --no:#b4330f; --nobg:#fde7dd; --hintbg:#fff3cf;
+  --star:#f2a900; --cube1:#2f7fd6; --cube2:#e4572e; --plate:#fff; --rulerbg:#f8e7a8; --rulerink:#3d2f05;
+  --gold1:#e7bd4a; --gold2:#8a6508; --silver1:#d6dde3; --silver2:#67747f;
+  --display:"Grandstander","Trebuchet MS",sans-serif; --body:"Andika","Segoe UI",Verdana,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1b29; --surface:#172a3c; --surface2:#21384d; --ink:#eaf3fa; --muted:#a4bacb; --hair:#2f4a61;
+  --red:#ff6b4f; --amber:#f2b632; --green:#3cc97c; --purple:#d17ee8; --blue:#63aaf5;
+  --ok:#53d990; --okbg:#143c29; --no:#ff9a7e; --nobg:#46231a; --hintbg:#40371a;
+  --star:#ffc53d; --cube1:#63aaf5; --cube2:#ff855f; --plate:#2a4258; --rulerbg:#e9d68f; --rulerink:#3d2f05;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1b29; --surface:#172a3c; --surface2:#21384d; --ink:#eaf3fa; --muted:#a4bacb; --hair:#2f4a61;
+  --red:#ff6b4f; --amber:#f2b632; --green:#3cc97c; --purple:#d17ee8; --blue:#63aaf5;
+  --ok:#53d990; --okbg:#143c29; --no:#ff9a7e; --nobg:#46231a; --hintbg:#40371a;
+  --star:#ffc53d; --cube1:#63aaf5; --cube2:#ff855f; --plate:#2a4258; --rulerbg:#e9d68f; --rulerink:#3d2f05;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font:400 18px/1.45 var(--body);-webkit-tap-highlight-color:transparent}
+#app{max-width:1040px;margin:0 auto;padding-block:16px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:800;line-height:1.1;margin:0;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-action:manipulation}
+button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:10px 22px;border-radius:14px;font-family:var(--display);font-weight:800;font-size:1.1rem;background:var(--ink);color:var(--bg)}
+.btn:active{transform:translateY(2px)}
+.btn.alt{background:var(--surface2);color:var(--ink)}
+.btn.wide{width:100%}
+.iconbtn{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:var(--surface2);flex:none}
+.iconbtn svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn[aria-pressed="false"]{opacity:.55}
+.textlink{text-decoration:underline;color:var(--muted);font-size:.95rem;padding:10px 4px}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.topbar .grow{flex:1;min-width:0}
+.eyebrow{font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700}
+
+/* Home */
+.mast{display:grid;gap:16px;grid-template-columns:1fr;margin-bottom:24px}
+.mast h1{font-size:clamp(2.1rem,7vw,3.3rem)}
+.ride-card{background:var(--ink);color:var(--bg);border-radius:20px;padding:18px;display:grid;gap:12px}
+.ride-card h2{font-size:1.5rem}
+.ride-card .btn{background:var(--star);color:#231a00}
+.stamps{display:flex;flex-wrap:wrap;gap:4px}
+.stamp{width:18px;height:18px;border-radius:50%;border:2px solid currentColor;opacity:.35}
+.stamp.on{background:var(--star);border-color:var(--star);opacity:1}
+@media(min-width:760px){.mast{grid-template-columns:1.1fr 1fr;align-items:center}}
+.line{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr}
+@media(min-width:760px){.line{grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:repeat(6,auto);column-gap:28px}}
+.stn{position:relative;padding-left:58px}
+.stn::before{content:"";position:absolute;left:21px;top:0;bottom:0;width:10px;background:var(--c)}
+.stn:first-child::before{top:30px}
+.stn:last-child::before{bottom:calc(100% - 30px)}
+.stn::after{content:"";position:absolute;left:10px;top:17px;width:32px;height:32px;border-radius:50%;background:var(--surface);border:6px solid var(--c)}
+.stn button{display:flex;width:100%;align-items:center;gap:12px;text-align:left;padding:10px 12px;margin-block:4px;border-radius:14px;background:var(--surface);min-height:68px}
+.stn button:hover{background:var(--surface2)}
+.code{flex:none;display:inline-block;min-width:42px;text-align:center;font:800 .9rem var(--display);padding:4px 8px;border-radius:8px;background:var(--c);color:var(--bg)}
+.stn .nm{flex:1;min-width:0;font-weight:700;font-size:1.08rem;line-height:1.2}
+.stn .pr{font-size:.82rem;color:var(--muted);font-weight:400;display:block;margin-top:2px}
+.bar-mini{width:100%;height:6px;border-radius:3px;background:var(--surface2);margin-top:5px;overflow:hidden}
+.bar-mini i{display:block;height:100%;background:var(--star)}
+.foot{margin-top:24px;display:flex;justify-content:center}
+
+/* Station */
+.head-stn{display:flex;gap:12px;align-items:center}
+.head-stn h1{font-size:clamp(1.6rem,5vw,2.3rem)}
+.skills{display:grid;gap:10px;margin-top:6px}
+@media(min-width:760px){.skills{grid-template-columns:1fr 1fr}}
+.skill{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;background:var(--surface);padding:14px;border-radius:16px}
+.skill h3{font-size:1.15rem}
+.skill .stars{grid-column:2;grid-row:1}
+.skill .acts{grid-column:1/-1;display:flex;gap:8px}
+.skill .acts .btn{flex:1;min-height:50px;font-size:1rem;padding:8px 10px}
+.star{width:22px;height:22px;display:inline-block;vertical-align:middle}
+.star path{fill:var(--surface2);stroke:var(--muted);stroke-width:1}
+.star.on path{fill:var(--star);stroke:var(--star)}
+.star.big{width:58px;height:58px}
+.mission{margin-top:18px;background:var(--hintbg);border-radius:16px;padding:14px 16px}
+.mission h3{font-size:1.05rem;margin-bottom:4px}
+
+/* Ride */
+.track{position:relative;display:flex;justify-content:space-between;align-items:center;height:44px;margin:0 14px 12px}
+.track::before{content:"";position:absolute;left:0;right:0;top:27px;height:6px;background:var(--c,var(--blue));border-radius:3px}
+.stop{position:relative;width:14px;height:14px;margin-top:16px;border-radius:50%;background:var(--surface);border:3px solid var(--c,var(--blue));z-index:1}
+.stop.done{background:var(--c,var(--blue))}
+.stop.miss{background:var(--surface2)}
+.train{position:absolute;top:0;width:44px;height:24px;margin-left:-22px;transition:left .6s ease-in-out;z-index:2}
+.play{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:820px){.play{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:start}}
+.card{background:var(--surface);border-radius:20px;padding:18px;min-width:0}
+.prompt{display:flex;gap:10px;align-items:flex-start}
+.prompt p{flex:1;min-width:0;font-size:clamp(1.25rem,3.8vw,1.55rem);line-height:1.3;font-weight:700}
+.vis{margin-top:14px;padding-block:8px;display:flex;flex-direction:column;align-items:center;gap:10px;overflow-x:auto}
+.vis>*{max-width:100%}
+.vis svg{max-width:100%;height:auto}
+.sum{font:800 clamp(2.1rem,8vw,3rem)/1.2 var(--display);font-variant-numeric:tabular-nums;text-align:center}
+.feedback{margin-top:14px;padding:12px 14px;border-radius:14px;font-size:1.05rem}
+.feedback.ok{background:var(--okbg);color:var(--ink)}
+.feedback.ok b{color:var(--ok)}
+.feedback.no{background:var(--nobg);color:var(--ink)}
+.feedback.no b{color:var(--no)}
+.feedback.hint{background:var(--hintbg);color:var(--ink)}
+.feedback .vis{margin-top:8px}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ansbox{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:6px;min-height:68px;border-radius:14px;background:var(--surface2);font:800 2.3rem var(--display);font-variant-numeric:tabular-nums}
+.ansbox .blank{min-width:1.5em;text-align:center;border-bottom:4px solid var(--ink);line-height:1.05}
+.key{min-height:62px;border-radius:14px;background:var(--surface);font:800 1.7rem var(--display);box-shadow:0 2px 0 var(--hair)}
+.key:active{transform:translateY(2px);box-shadow:none}
+.key.go{background:var(--ink);color:var(--bg);font-size:1.2rem;box-shadow:none}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice{min-height:68px;padding:8px;border-radius:14px;background:var(--surface);box-shadow:0 2px 0 var(--hair);font:800 1.25rem/1.15 var(--display);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0}
+.choice small{font:400 .95rem var(--body)}
+.choice.wrong{background:var(--nobg);opacity:.7}
+.choice.right{background:var(--okbg);outline:3px solid var(--ok)}
+.choice svg{width:72px;height:72px}
+.tools{display:grid;gap:10px}
+.iconrow{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
+.iconrow button{padding:6px;border-radius:12px;background:var(--surface2);display:flex}
+.iconrow button.right{outline:3px solid var(--ok);background:var(--okbg)}
+.iconrow button.wrong{background:var(--nobg);opacity:.7}
+.iconrow svg{width:42px;height:42px}
+.stepper{display:grid;grid-template-columns:56px 1fr 56px;align-items:center;gap:8px;background:var(--surface);padding:8px;border-radius:14px}
+.stepper span{text-align:center;font-weight:700}
+.stepper button{height:56px;border-radius:12px;background:var(--surface2);font:800 1.4rem var(--display)}
+.tray{min-height:76px;border:3px dashed var(--hair);border-radius:14px;padding:6px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-items:center;color:var(--muted)}
+.bank{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.bank button,.tray button{padding:2px;display:inline-flex;border-radius:10px}
+.slots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.slot{width:64px;height:60px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--surface2);font:800 1.4rem var(--display)}
+.slot.fill{background:var(--ink);color:var(--bg)}
+.chip{width:72px;height:60px;border-radius:12px;background:var(--surface);box-shadow:0 2px 0 var(--hair);font:800 1.4rem var(--display)}
+.chip[disabled]{opacity:.2}
+
+/* Visual parts */
+.cubes{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:flex-end}
+.rod{display:grid;grid-template-rows:repeat(10,10px);gap:1px;width:14px;background:none}
+.rod i,.one{display:block;background:var(--cube1);border-radius:2px}
+.rod i{width:14px;height:10px}
+.one{width:14px;height:14px;background:var(--cube2)}
+.ones{display:grid;grid-template-columns:repeat(5,14px);gap:2px;align-self:flex-end;margin-left:6px}
+.frames{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.frame{display:grid;grid-template-columns:repeat(5,26px);grid-template-rows:repeat(2,26px);gap:2px;background:var(--hair);padding:2px;border-radius:6px}
+.frame i{display:flex;align-items:center;justify-content:center;background:var(--surface);position:relative}
+.frame i.a::after,.frame i.b::after,.frame i.x::after{content:"";width:18px;height:18px;border-radius:50%}
+.frame i.a::after{background:var(--cube1)}
+.frame i.b::after{background:var(--cube2)}
+.frame i.x::after{background:var(--hair);box-shadow:inset 0 0 0 2px var(--muted)}
+.frame i.x::before{content:"";position:absolute;width:22px;height:3px;background:var(--no);transform:rotate(-45deg);z-index:1}
+.bond circle{fill:var(--surface2);stroke:var(--ink);stroke-width:3}
+.bond circle.ask{fill:var(--hintbg);stroke:var(--amber)}
+.bond line{stroke:var(--ink);stroke-width:3}
+.bond text{fill:var(--ink);font:800 30px var(--display);text-anchor:middle;dominant-baseline:central}
+.vert{display:inline-grid;grid-template-columns:40px 48px 48px;font:800 2.4rem/1.2 var(--display);font-variant-numeric:tabular-nums;text-align:center}
+.vert small{font:700 1rem var(--body);color:var(--muted)}
+.vert .rule{grid-column:1/-1;border-top:4px solid var(--ink);margin-block:2px}
+.groups{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.group{display:flex;flex-wrap:wrap;gap:1px;justify-content:center;align-content:center;border:3px solid var(--hair);border-radius:50px;padding:10px;background:var(--plate);width:104px;min-height:104px}
+.group svg{width:26px;height:26px}
+.tens{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tenbox{display:grid;grid-template-columns:repeat(5,28px);gap:1px;padding:4px;border:2px solid var(--hair);border-radius:8px;background:var(--plate)}
+.tenbox svg{width:28px;height:28px}
+.coin text{font:800 13px var(--display);text-anchor:middle;dominant-baseline:central;fill:#2a2000}
+.moneyrow{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center}
+.note{display:inline-flex;flex-direction:column;justify-content:center;width:86px;height:46px;border-radius:5px;padding:2px 8px;color:#fff;font:800 1.2rem/1 var(--display);box-shadow:inset 0 0 0 2px #ffffff55}
+.note small{font:400 .62rem var(--body)}
+.n2{background:#6d3a9c}.n5{background:#26804a}.n10{background:#b6292c}.n50{background:#1f5ca8}.n100{background:#c86a12}
+.purses{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.purse{background:var(--surface2);border-radius:12px;padding:8px;text-align:center;min-width:0}
+.purse b{display:block;margin-bottom:4px}
+.face{fill:var(--plate);stroke:var(--ink);stroke-width:4}
+.tick{stroke:var(--ink)}
+.clk text{fill:var(--ink);font:800 15px var(--display);text-anchor:middle;dominant-baseline:central}
+.hh{stroke:var(--red);stroke-width:7;stroke-linecap:round}
+.mh{stroke:var(--blue);stroke-width:4.5;stroke-linecap:round}
+.clk .pin{fill:var(--ink)}
+.rul rect.body{fill:var(--rulerbg);stroke:var(--rulerink)}
+.rul line{stroke:var(--rulerink)}
+.rul text{fill:var(--rulerink);font:700 11px var(--body);text-anchor:middle}
+.rul .guide{stroke:var(--muted);stroke-dasharray:3 3}
+.shp{stroke:var(--ink);stroke-width:2.5}
+.f-square{fill:var(--cube1)}.f-rectangle{fill:#e8a33c}.f-triangle{fill:#3fae76}.f-circle{fill:#e4572e}.f-half{fill:#b05cc8}.f-quarter{fill:#37b7c3}
+.graph{display:grid;grid-template-columns:auto 1fr;gap:4px 8px;align-items:center;width:100%;max-width:440px}
+.graph .lb{font-weight:700;font-size:.95rem;line-height:1.1;text-align:right}
+.graph .rw{display:grid;grid-template-columns:repeat(9,minmax(0,28px));gap:2px;border-left:3px solid var(--ink);padding-left:4px;min-height:32px;align-items:center}
+.graph .rw svg{width:100%;height:auto;display:block}
+.key-line{font-size:.92rem;color:var(--muted);display:flex;align-items:center;gap:4px}
+.key-line svg{width:22px;height:22px}
+.bars{display:grid;gap:6px;width:100%;max-width:400px}
+.brow{display:flex;gap:6px;align-items:center}
+.brow .who{width:58px;text-align:right;font-size:.85rem;font-weight:700;flex:none;overflow-wrap:anywhere;line-height:1.05}
+.brow .track2{display:flex;flex:1;min-width:0}
+.seg{height:38px;display:flex;align-items:center;justify-content:center;font:800 1.05rem var(--display);border:2px solid var(--ink);margin-left:-2px;background:var(--surface2);min-width:30px}
+.seg.q{background:var(--hintbg)}
+.total{font:800 1.05rem var(--display);text-align:center;border-top:3px solid var(--ink);margin-left:64px;padding-top:2px}
+.plates{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.plate{width:94px;min-height:94px;border-radius:50%;border:3px solid var(--hair);background:var(--plate);display:flex;flex-wrap:wrap;gap:0;align-content:center;justify-content:center;padding:8px}
+.plate svg{width:22px;height:22px}
+.fig{width:220px;max-width:100%}
+.tstep{margin-top:10px}
+.tbl{width:100%;border-collapse:collapse;font-size:.98rem}
+.tbl td,.tbl th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--hair);vertical-align:top}
+.tbl th{font-size:.85rem;color:var(--muted)}
+.wrapx{overflow-x:auto}
+.done-card{text-align:center;display:grid;gap:14px;justify-items:center;padding-block:28px}
+.done-card h1{font-size:clamp(2rem,7vw,3rem)}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.pop{animation:pop .4s ease-out backwards}
+@keyframes pop{from{transform:scale(.3)}70%{transform:scale(1.15)}}
+.parent h2{font-size:1.25rem;margin:22px 0 8px}
+.danger{color:var(--no)}
+/* Read-along */
+.w{display:inline-block;border-radius:6px;transition:background-color .12s,transform .12s}
+.w.now{background:var(--star);color:#231a00;box-shadow:0 0 0 3px var(--star);transform:scale(1.08)}
+.iconbtn.live{background:var(--star);color:#231a00;animation:speak 1s ease-in-out infinite}
+@keyframes speak{50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--star) 35%,transparent)}}
+.vis.talking,.talking{border-radius:14px;background:var(--hintbg);box-shadow:0 0 0 6px var(--hintbg)}
+.fbrow{display:flex;gap:10px;align-items:flex-start}
+.fbrow>span{flex:1;min-width:0}
+.fbrow .iconbtn{width:40px;height:40px;background:var(--surface)}
+.pop-in{animation:popin .42s cubic-bezier(.3,1.5,.5,1) backwards}
+.fade-in{animation:fadein .35s ease-out backwards}
+.grow-x{transform-box:fill-box;transform-origin:left center;animation:growx .8s ease-out backwards}
+.sweep{transform-origin:100px 100px;animation:sweep 1s ease-out backwards}
+@keyframes popin{from{opacity:0;transform:scale(.2)}}
+@keyframes fadein{from{opacity:0}}
+@keyframes growx{from{transform:scaleX(0)}}
+@keyframes sweep{from{transform:rotate(-70deg)}}
+/* Pictures that light up with the spoken words */
+.lit{outline:3px solid var(--star);outline-offset:2px;border-radius:10px;transition:transform .18s,background-color .18s}
+svg *.lit{outline:0}
+.t{display:inline-block;border-radius:8px;padding-inline:4px}
+.t.lit,.sum.lit,.vert>.lit,.seg.lit,.total.lit{background:var(--star);color:#231a00;outline:0}
+.rod.lit{outline:0}.rod.lit i{background:var(--star);box-shadow:0 0 0 1px var(--amber);transition:background-color .15s}
+.rod.lit i:nth-child(10){transition-delay:0s}.rod.lit i:nth-child(9){transition-delay:.03s}.rod.lit i:nth-child(8){transition-delay:.06s}.rod.lit i:nth-child(7){transition-delay:.09s}.rod.lit i:nth-child(6){transition-delay:.12s}.rod.lit i:nth-child(5){transition-delay:.15s}.rod.lit i:nth-child(4){transition-delay:.18s}.rod.lit i:nth-child(3){transition-delay:.21s}.rod.lit i:nth-child(2){transition-delay:.24s}.rod.lit i:nth-child(1){transition-delay:.27s}
+.one.lit{background:var(--star);outline:2px solid var(--amber);outline-offset:-1px;border-radius:2px}
+.frame i.lit{background:var(--star);outline:0;border-radius:0}
+.group.lit,.plate.lit,.purse.lit{background:var(--hintbg);border-color:var(--star);border-radius:50px}
+.purse.lit{border-radius:12px}
+.rw.lit{background:var(--hintbg);outline-offset:0}
+svg.lit,.note.lit{outline:0;transform:scale(1.2);filter:drop-shadow(0 0 5px var(--star))}
+.moneyrow>div.lit{background:var(--hintbg)}
+.bond circle.lit{fill:var(--star);stroke:var(--amber)}.bond circle.lit+text{fill:#231a00}
+.hh.lit,.mh.lit{stroke:var(--star);stroke-width:9}
+.clk text.lit{fill:var(--red);font-size:22px}
+.rul text.lit{fill:#c0200a;font-size:17px;font-weight:800}.rul rect.lit{stroke:#c0200a;stroke-width:3}
+.shp.lit{stroke:var(--star);stroke-width:6}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="app"></div>
+
+<script>
+/* ---------- helpers ---------- */
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[ri(0,a.length-1)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=ri(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+const sample=(a,n)=>shuffle(a).slice(0,n);
+const NAMES=['Mei Ling','Ahmad','Priya','Wei Jie','Siti','Ravi','Hui Min','Farah','Arjun','Jun Kai','Aisyah','Kumar'];
+const two=()=>sample(NAMES,2);
+const hw=h=>((h-1+120)%12)+1;
+const tf=(h,m)=>`${h}.${String(m).padStart(2,'0')}`;
+const addMin=(h,m,d)=>{const t=h*60+m+d;return [hw(Math.floor(t/60)),t%60]};
+const ORD=['','first','second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth'];
+const ORN=['','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th'];
+const ON=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+const TN=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+const word=n=>n===100?'one hundred':n<20?ON[n]:TN[Math.floor(n/10)]+(n%10?'-'+ON[n%10]:'');
+function numOpts(a,cand,n=4){const out=[a];for(const c of shuffle(cand)){if(out.length>=n)break;if(c>=0&&c<=120&&!out.includes(c))out.push(c)}
+  let k=1;while(out.length<n){const c=a+k;if(!out.includes(c))out.push(c);k=k>0?-k:-k+1;if(a+k<0)k=-k+1}return shuffle(out).map(v=>({l:String(v),v}))}
+function txtOpts(a,cand,n=4){return shuffle([a,...sample(cand.filter(c=>c!==a),n-1)]).map(v=>({l:v,v}))}
+
+/* ---------- icons ---------- */
+const ICONS={
+ rambutan:{n:'rambutan',s:'<g stroke="#b3201c" stroke-width="2" stroke-linecap="round"><path d="M20 3v5M20 32v5M3 20h5M32 20h5M8 8l4 4M28 28l4 4M32 8l-4 4M8 32l4-4"/></g><circle cx="20" cy="20" r="13" fill="#d8332b" stroke="#8f1512" stroke-width="1.5"/><ellipse cx="16" cy="15" rx="3" ry="2" fill="#f58b84"/>'},
+ kueh:{n:'ang ku kueh',s:'<ellipse cx="20" cy="21" rx="16" ry="13" fill="#e8497a" stroke="#99234c" stroke-width="1.5"/><path d="M20 11v20M11 14c3 4 3 10 0 14M29 14c-3 4-3 10 0 14" fill="none" stroke="#a42c56" stroke-width="2"/>'},
+ tart:{n:'egg tart',s:'<path d="M4 18l4 13a3 3 0 0 0 3 2h18a3 3 0 0 0 3-2l4-13z" fill="#b97a33" stroke="#6e4415" stroke-width="1.5"/><ellipse cx="20" cy="17" rx="16" ry="8" fill="#ffd53f" stroke="#6e4415" stroke-width="1.5"/><ellipse cx="15" cy="15" rx="4" ry="1.6" fill="#fff0a8"/>'},
+ durian:{n:'durian',s:'<path d="M20 3l4 5 6-2 1 6 6 2-2 6 3 5-5 3 0 6-6 0-3 5-5-3-5 3-3-5-6 0 0-6-5-3 3-5-2-6 6-2 1-6 6 2z" fill="#8ca82f" stroke="#4a5e10" stroke-width="1.5"/><path d="M14 16l2 2M24 14l2 2M18 25l2 2M27 24l2 2M12 25l2 2" stroke="#4a5e10" stroke-width="2" stroke-linecap="round"/>'},
+ satay:{n:'satay',s:'<path d="M6 36L34 6" stroke="#9a7a48" stroke-width="3" stroke-linecap="round"/><g fill="#a35418" stroke="#5e2e0a" stroke-width="1.5"><rect x="22" y="7" width="11" height="10" rx="2" transform="rotate(-45 27 12)"/><rect x="15" y="14" width="11" height="10" rx="2" transform="rotate(-45 20 19)"/><rect x="8" y="21" width="11" height="10" rx="2" transform="rotate(-45 13 26)"/></g>'},
+ orchid:{n:'orchid',s:'<g fill="#b759d1" stroke="#6d2487" stroke-width="1.2"><ellipse cx="20" cy="9" rx="6" ry="8"/><ellipse cx="9" cy="17" rx="8" ry="6"/><ellipse cx="31" cy="17" rx="8" ry="6"/><ellipse cx="12" cy="30" rx="6" ry="7"/><ellipse cx="28" cy="30" rx="6" ry="7"/></g><circle cx="20" cy="20" r="5" fill="#ffd53f" stroke="#a37e00"/>'},
+ mango:{n:'mango',s:'<path d="M9 12c8-9 25-5 26 9 1 12-15 18-24 12C3 28 4 18 9 12z" fill="#f8a01f" stroke="#a15d00" stroke-width="1.5"/><path d="M20 8c2-4 6-5 10-4-1 4-5 6-10 4z" fill="#3fae76" stroke="#1c6b43"/>'},
+ pau:{n:'pau',s:'<path d="M5 28c-2-11 7-20 15-20s17 9 15 20c-1 4-29 4-30 0z" fill="#fff8ec" stroke="#6b5a42" stroke-width="1.5"/><circle cx="20" cy="17" r="3" fill="#e4342e"/>'},
+ otter:{n:'otter',s:'<circle cx="9" cy="10" r="4" fill="#7d5128" stroke="#3f2810"/><circle cx="31" cy="10" r="4" fill="#7d5128" stroke="#3f2810"/><circle cx="20" cy="21" r="15" fill="#8e5e30" stroke="#3f2810" stroke-width="1.5"/><ellipse cx="20" cy="27" rx="9" ry="7" fill="#efdcc0"/><circle cx="14" cy="18" r="2.2" fill="#1a1208"/><circle cx="26" cy="18" r="2.2" fill="#1a1208"/><ellipse cx="20" cy="24" rx="2.5" ry="1.8" fill="#1a1208"/>'},
+ bus:{n:'bus',s:'<rect x="5" y="5" width="30" height="28" rx="4" fill="#d8332b" stroke="#7d1512" stroke-width="1.5"/><rect x="9" y="9" width="22" height="8" fill="#d8f0fa"/><rect x="9" y="20" width="22" height="6" fill="#d8f0fa"/><circle cx="13" cy="34" r="3.5" fill="#222"/><circle cx="27" cy="34" r="3.5" fill="#222"/>'},
+ fish:{n:'fish',s:'<path d="M3 20c7-11 19-11 27 0-8 11-20 11-27 0z" fill="#37b7c3" stroke="#14656d" stroke-width="1.5"/><path d="M29 20l8-7v14z" fill="#37b7c3" stroke="#14656d" stroke-width="1.5"/><circle cx="11" cy="18" r="2" fill="#10293f"/>'},
+ merl:{n:'ice cream',s:'<path d="M12 18h16l-8 19z" fill="#c9893e" stroke="#6e4415" stroke-width="1.5"/><circle cx="20" cy="12" r="9" fill="#ffc1d6" stroke="#b0577a" stroke-width="1.5"/>'}
+};
+const ic=(k,size)=>`<svg viewBox="0 0 40 40" aria-hidden="true"${size?` width="${size}" height="${size}"`:''}>${ICONS[k].s}</svg>`;
+const THINGS=['rambutan','kueh','tart','durian','orchid','mango','pau','satay'];
+const PL={rambutan:'rambutans',kueh:'ang ku kueh',tart:'egg tarts',durian:'durians',orchid:'orchids',mango:'mangoes',pau:'pau',satay:'satay sticks',otter:'otters',bus:'buses',fish:'fish',merl:'ice creams'};
+const STAR='<path d="M12 2l3 6.6 7 .8-5.2 4.8 1.5 7L12 17.6 5.700 21.200l1.500-7L2 9.400l7-.8z"/>';
+const star=(on,big)=>`<svg class="star ${on?'on':''} ${big?'big pop':''}" viewBox="0 0 24 24" aria-hidden="true">${STAR}</svg>`;
+const stars=n=>`<span aria-label="${n} of 3 stars">${star(n>=1)}${star(n>=2)}${star(n>=3)}</span>`;
+const TRAIN='<svg class="train" viewBox="0 0 44 24" id="train" aria-hidden="true"><rect x="1" y="1" width="42" height="19" rx="7" fill="var(--ink)"/><rect x="28" y="5" width="11" height="7" rx="2" fill="var(--bg)"/><rect x="6" y="5" width="7" height="7" fill="var(--bg)"/><rect x="16" y="5" width="7" height="7" fill="var(--bg)"/><circle cx="11" cy="21" r="2.500" fill="var(--ink)"/><circle cx="33" cy="21" r="2.500" fill="var(--ink)"/></svg>';
+const SVG_SPK='<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16.500 8.500a5 5 0 0 1 0 7M19 6a9 9 0 0 1 0 12"/></svg>';
+const SVG_X='<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const SVG_BACK='<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
+
+/* ---------- visual builders ---------- */
+const rods=(t,o)=>`<div class="cubes">${'<div class="rod">'.concat('<i></i>'.repeat(10),'</div>').repeat(t)}${o?`<div class="ones">${'<span class="one"></span>'.repeat(o)}</div>`:''}</div>`;
+function frames(a,b=0,x=0){ /* a blue, b orange, last x of total crossed */
+  const total=a+b,cells=Math.max(10,Math.ceil(total/10)*10);let html='<div class="frames">';
+  for(let f=0;f<cells;f+=10){html+='<div class="frame">';for(let i=f;i<f+10;i++){const cl=i>=total?'':i>=total-x?'x':i<a?'a':'b';html+=`<i class="${cl}"></i>`}html+='</div>'}return html+'</div>'}
+function bond(w,a,b,miss){const T=(cx,cy,v,k)=>`<circle class="${miss===k?'ask':''}" cx="${cx}" cy="${cy}" r="34"/><text x="${cx}" y="${cy}">${miss===k?'?':v}</text>`;
+  return `<svg class="bond" viewBox="0 0 240 180" width="240" role="img" aria-label="number bond"><line x1="120" y1="50" x2="56" y2="130"/><line x1="120" y1="50" x2="184" y2="130"/>${T(120,40,w,'w')}${T(56,138,a,'a')}${T(184,138,b,'b')}</svg>`}
+function vert(a,op,b,ans='?'){const d=n=>[n>=10?Math.floor(n/10):'',n%10];const [at,ao]=d(a),[bt,bo]=d(b);
+  const ansS=String(ans);const a3=ansS.length>2;
+  return `<div class="vert" role="img" aria-label="${a} ${op==='+'?'plus':'minus'} ${b}"><small></small><small>T</small><small>O</small><span></span><span>${at}</span><span>${ao}</span><span>${op}</span><span>${bt}</span><span>${bo}</span><div class="rule"></div><span>${a3?ansS[0]:''}</span><span>${ansS==='?'?'':a3?ansS[1]:ansS.length>1?ansS[0]:''}</span><span>${ansS==='?'?'?':ansS[ansS.length-1]}</span></div>`}
+const tenBoxes=(k,n)=>{let out='<div class="tens">',left=n;while(left>0){const c=Math.min(left,10);out+=`<div class="tenbox">${ic(k).repeat(c)}</div>`;left-=c}return out+'</div>'};
+const groupsV=(g,n,k)=>`<div class="groups">${`<div class="group">${ic(k).repeat(n)}</div>`.repeat(g)}</div>`;
+const plates=(counts,k)=>`<div class="plates">${counts.map(c=>`<div class="plate">${ic(k).repeat(c)}</div>`).join('')}</div>`;
+const COINR={5:17,10:19,20:21,50:24,100:27};
+function coin(c,sc=1){const r=COINR[c]*sc,s=r*2+2,gold=c===5||c===100;const l=c===100?'$1':c+'c';
+  return `<svg class="coin" viewBox="0 0 ${s} ${s}" width="${s}" height="${s}" role="img" aria-label="${c===100?'1 dollar':c+' cents'}"><circle cx="${s/2}" cy="${s/2}" r="${r}" fill="${gold?'var(--gold1)':'var(--silver1)'}" stroke="${gold?'var(--gold2)':'var(--silver2)'}" stroke-width="2"/>${c===100?`<circle cx="${s/2}" cy="${s/2}" r="${r*.7}" fill="var(--silver1)" stroke="var(--gold2)"/>`:''}<text x="${s/2}" y="${s/2+.5}">${l}</text></svg>`}
+const coins=l=>`<div class="moneyrow">${l.map(c=>coin(c,1.3)).join('')}</div>`;
+const note=d=>`<span class="note n${d}" role="img" aria-label="${d} dollars">$${d}<small>${word(d)} dollars</small></span>`;
+const notes=l=>`<div class="moneyrow">${l.map(note).join('')}</div>`;
+function clock(h,m){const A=(deg,len)=>{const r=(deg-90)*Math.PI/180;return `x2="${(100+len*Math.cos(r)).toFixed(1)}" y2="${(100+len*Math.sin(r)).toFixed(1)}"`};
+  let marks='';for(let i=0;i<60;i++){const r=i*6*Math.PI/180,o=i%5===0;const r1=o?84:89;marks+=`<line class="tick" stroke-width="${o?2.5:1}" x1="${(100+r1*Math.sin(r)).toFixed(1)}" y1="${(100-r1*Math.cos(r)).toFixed(1)}" x2="${(100+93*Math.sin(r)).toFixed(1)}" y2="${(100-93*Math.cos(r)).toFixed(1)}"/>`}
+  let nums='';for(let i=1;i<=12;i++){const r=i*30*Math.PI/180;nums+=`<text x="${(100+71*Math.sin(r)).toFixed(1)}" y="${(100-71*Math.cos(r)).toFixed(1)}">${i}</text>`}
+  return `<svg class="clk" viewBox="0 0 200 200" width="220" role="img" aria-label="clock showing ${tf(h,m)}"><circle class="face" cx="100" cy="100" r="96"/>${marks}${nums}<line class="hh" x1="100" y1="100" ${A(((h%12)+m/60)*30,46)}/><line class="mh" x1="100" y1="100" ${A(m*6,68)}/><circle class="pin" cx="100" cy="100" r="6"/></svg>`}
+const CM=22,RX=14;
+function ruler(items,maxcm=15){ /* items: [{from,len,color,h}] */
+  const W=maxcm*CM+RX*2,iH=items.length*26+6,H=iH+50;let s=`<svg class="rul" viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="ruler in centimetres">`;
+  items.forEach((it,i)=>{const y=4+i*26,x=RX+it.from*CM,w=it.len*CM;const c=it.color||'var(--cube1)';
+    s+=`<rect x="${x}" y="${y}" width="${w}" height="18" rx="4" fill="${c}" stroke="var(--ink)" stroke-width="1.5"/>`;
+    s+=`<line class="guide" x1="${x}" y1="${y+18}" x2="${x}" y2="${iH+8}"/><line class="guide" x1="${x+w}" y1="${y+18}" x2="${x+w}" y2="${iH+8}"/>`});
+  s+=`<rect class="body" x="2" y="${iH}" width="${W-4}" height="44" rx="4"/>`;
+  for(let i=0;i<=maxcm*2;i++){const x=RX+i*CM/2,c=i%2===0;s+=`<line stroke-width="${c?1.6:.8}" x1="${x}" y1="${iH}" x2="${x}" y2="${iH+(c?16:9)}"/>`;if(c)s+=`<text x="${x}" y="${iH+32}">${i/2}</text>`}
+  s+=`<text x="${W-14}" y="${iH+13}" style="font-size:9px">cm</text></svg>`;return s}
+const SHAPE_NAME={square:'square',rectangle:'rectangle',triangle:'triangle',circle:'circle',half:'half circle',quarter:'quarter circle'};
+const PLURAL={square:'squares',rectangle:'rectangles',triangle:'triangles',circle:'circles',half:'half circles',quarter:'quarter circles'};
+function shape(kind,v=0,rot=0){let el='';
+  if(kind==='square')el='<rect x="-36" y="-36" width="72" height="72"/>';
+  if(kind==='circle')el='<circle r="42"/>';
+  if(kind==='rectangle'){const [w,h]=[[92,44],[44,92],[80,52]][v%3];el=`<rect x="${-w/2}" y="${-h/2}" width="${w}" height="${h}"/>`}
+  if(kind==='triangle')el=`<polygon points="${['0,-40 40,28 -40,28','-34,-36 -34,30 38,30','-42,26 40,32 -8,-38'][v%3]}"/>`;
+  if(kind==='half')el='<path d="M-44 16A44 44 0 0 1 44 16Z"/>';
+  if(kind==='quarter')el='<path d="M-30 32L-30 -38A70 70 0 0 1 40 32Z"/>';
+  return `<svg viewBox="-60 -60 120 120" width="110" role="img" aria-label="shape"><g class="shp f-${kind}" transform="rotate(${rot})">${el}</g></svg>`}
+const sq=(x,y,s)=>({k:'square',e:`<rect x="${x}" y="${y}" width="${s}" height="${s}"/>`});
+const re=(x,y,w,h)=>({k:'rectangle',e:`<rect x="${x}" y="${y}" width="${w}" height="${h}"/>`});
+const tr=p=>({k:'triangle',e:`<polygon points="${p}"/>`});
+const ci=(x,y,r)=>({k:'circle',e:`<circle cx="${x}" cy="${y}" r="${r}"/>`});
+const hc=(x,y,r,up)=>({k:'half',e:`<path d="M${x-r} ${y}A${r} ${r} 0 0 ${up?1:0} ${x+r} ${y}Z"/>`});
+const qc=(x,y,r)=>({k:'quarter',e:`<path d="M${x} ${y}L${x+r} ${y}A${r} ${r} 0 0 1 ${x} ${y+r}Z"/>`});
+const FIGS={
+ house:[sq(50,90,100),tr('40,90 160,90 100,30'),re(88,140,24,50),sq(60,105,26),sq(114,105,26),qc(4,4,34)],
+ rocket:[re(75,50,50,110),tr('75,50 125,50 100,10'),tr('75,160 75,120 45,160'),tr('125,160 125,120 155,160'),ci(100,80,12),ci(100,118,12),re(85,160,30,20)],
+ boat:[hc(100,130,62,false),re(96,40,8,90),tr('106,45 106,122 160,122'),tr('94,60 94,122 50,122'),ci(32,35,16)],
+ robot:[sq(70,28,60),tr('90,28 110,28 100,10'),ci(88,50,7),ci(112,50,7),re(60,92,80,58),sq(90,110,20),re(38,94,18,50),re(144,94,18,50),re(72,150,20,40),re(108,150,20,40)],
+ icecream:[tr('62,100 138,100 100,190'),hc(100,100,38,true),ci(100,52,10),re(128,18,8,50)],
+ fish:[tr('130,100 185,62 185,138'),hc(90,58,24,true),ci(90,100,46),ci(72,88,7),ci(28,40,8),ci(18,68,5)],
+ flower:[qc(4,4,40),ci(100,42,15),ci(100,98,15),ci(72,70,15),ci(128,70,15),ci(100,70,14),re(96,112,8,74),hc(76,150,18,true),hc(124,150,18,true)]
+};
+const figure=n=>`<svg class="fig" viewBox="0 0 200 200" role="img" aria-label="picture made of shapes">${FIGS[n].map(p=>`<g class="shp f-${p.k}">${p.e}</g>`).join('')}</svg>`;
+function graphV(rows,unit,k0){return `<div class="graph">${rows.map(r=>`<div class="lb">${r.l}</div><div class="rw">${ic(r.k||k0).repeat(r.v)}</div>`).join('')}</div>`}
+function bars(rows,total){const tot=Math.max(...rows.map(r=>r.parts.reduce((s,p)=>s+p.w,0)));
+  return `<div class="bars">${rows.map(r=>`<div class="brow"><span class="who">${r.who||''}</span><div class="track2">${r.parts.map(p=>`<span class="seg ${p.q?'q':''}" style="width:${p.w/tot*100}%">${p.l}</span>`).join('')}</div></div>`).join('')}${total?`<div class="total">${total}</div>`:''}</div>`}
+
+/* ---------- question generators ---------- */
+function makeTen(a,b){const need=10-a;return `${a} needs ${need} to make 10. Split ${b} into ${need} and ${b-need}. 10 + ${b-need} = ${a+b}.`}
+function subTen(a,b){const o=a-10;return `Split ${a} into 10 and ${o}. 10 − ${b} = ${10-b}. Then ${10-b} + ${o} = ${a-b}.`}
+function addParts(a,b){const at=Math.floor(a/10),ao=a%10,bt=Math.floor(b/10),bo=b%10,s=ao+bo;
+  return s>=10?`Ones: ${ao} + ${bo} = ${s}. Write ${s-10}, carry 1 ten. Tens: ${at} + ${bt} + 1 = ${at+bt+1}. So ${a} + ${b} = ${a+b}.`:`Ones: ${ao} + ${bo} = ${s}. Tens: ${at} + ${bt} = ${at+bt}. So ${a} + ${b} = ${a+b}.`}
+function subParts(a,b){const at=Math.floor(a/10),ao=a%10,bt=Math.floor(b/10),bo=b%10;
+  return ao<bo?`${ao} is smaller than ${bo}, so change 1 ten into 10 ones. Ones: ${ao+10} − ${bo} = ${ao+10-bo}. Tens: ${at-1} − ${bt} = ${at-1-bt}. So ${a} − ${b} = ${a-b}.`:`Ones: ${ao} − ${bo} = ${ao-bo}. Tens: ${at} − ${bt} = ${at-bt}. So ${a} − ${b} = ${a-b}.`}
+const sumVis=s=>`<div class="sum">${s}</div>`;
+const NUM=(o)=>({kind:'num',...o});
+const CH=(o)=>({kind:'choice',...o});
+
+const G={
+ count(){const r=Math.random();
+   if(r<.35){const k=pick(THINGS),n=ri(11,40);return NUM({q:`How many ${PL[k]} are there?`,vis:tenBoxes(k,n),a:n,hint:'Each full box has 10. Count the tens first, then the ones.',why:`${Math.floor(n/10)} tens and ${n%10} ones make ${n}.`})}
+   const n=ri(12,100),t=Math.floor(n/10),o=n%10;return NUM({q:'How many cubes are there?',vis:rods(t,o),a:n,hint:'Each tall stick has 10 cubes. Count in tens, then add the small cubes.',why:`${t} tens and ${o} ones make ${n}.`})},
+ place(){const r=ri(0,3),n=ri(11,99),t=Math.floor(n/10),o=n%10;
+   if(r===0)return {kind:'build',q:`Build the number ${n}. Tap + to add tens and ones.`,a:n,hint:`${n} has ${t} tens and ${o} ones.`,why:`${n} is ${t} tens and ${o} ones.`};
+   if(r===1)return NUM({q:`How many tens are in ${n}?`,vis:sumVis(n),a:t,suf:'tens',hint:'The tens digit is on the left.',why:`${n} = ${t} tens and ${o} ones.`});
+   if(r===2)return NUM({q:`How many ones are in ${n}?`,vis:sumVis(n),a:o,suf:'ones',hint:'The ones digit is on the right.',why:`${n} = ${t} tens and ${o} ones.`});
+   return NUM({q:`${t} tens and ${o} ones make what number?`,a:n,hint:`Write the tens first, then the ones.`,why:`${t} tens = ${t*10}. ${t*10} + ${o} = ${n}.`})},
+ words(){const n=ri(11,99);const d=[n+1,n-1,n+10,n-10,(n%10)*10+Math.floor(n/10)].filter(x=>x>10&&x<100&&x!==n);
+   if(Math.random()<.5)return CH({q:`Which number is ${word(n)}?`,a:n,choices:numOpts(n,d),hint:`Listen for the tens word first: ${TN[Math.floor(n/10)]||'teen numbers start with 1'}.`,why:`${word(n)[0].toUpperCase()+word(n).slice(1)} is ${n}.`});
+   const w=word(n),opts=[...new Set(d.map(word))];return CH({q:`How do you write ${n} in words?`,a:w,choices:txtOpts(w,opts,Math.min(4,opts.length+1)).map(c=>({l:`<small>${c.l}</small>`,v:c.v})),say:`How do you write ${n} in words?`,hint:'Say the number out loud, then find the matching words.',why:`${n} is ${w}.`})},
+ compare(){const r=ri(0,3);
+   if(r===0){const ns=sample(Array.from({length:89},(_,i)=>i+11),4),big=Math.random()<.5,a=big?Math.max(...ns):Math.min(...ns);return CH({q:`Which number is the ${big?'greatest':'smallest'}?`,a,choices:shuffle(ns).map(v=>({l:String(v),v})),hint:'Look at the tens first. If the tens are the same, look at the ones.',why:`${a} is the ${big?'greatest':'smallest'}.`})}
+   if(r===1){const n=ri(12,88),more=Math.random()<.5,d=pick([1,10]),a=more?n+d:n-d;return NUM({q:`What is ${d} ${more?'more':'less'} than ${n}?`,a,hint:d===10?'Change the tens digit by 1. The ones stay the same.':'Count on or back by 1.',why:`${d} ${more?'more':'less'} than ${n} is ${a}.`})}
+   if(r===2){const a=ri(11,99);let b;do{b=ri(11,99)}while(b===a);const sym=a>b?'greater':'smaller';return CH({q:`Is ${a} greater or smaller than ${b}?`,a:sym,choices:[{l:'greater',v:'greater'},{l:'smaller',v:'smaller'}],vis:sumVis(`${a} , ${b}`),hint:'Compare the tens first, then the ones.',why:`${a} is ${sym} than ${b}.`})}
+   const ns=sample(Array.from({length:89},(_,i)=>i+11),4),up=Math.random()<.5;return {kind:'order',q:`Tap the numbers in order, from ${up?'smallest to greatest':'greatest to smallest'}.`,nums:ns,a:[...ns].sort((x,y)=>up?x-y:y-x),hint:'Look at the tens first. If the tens are the same, look at the ones.',why:`The order is ${[...ns].sort((x,y)=>up?x-y:y-x).join(', ')}.`}},
+ pattern(){const step=pick([1,2,5,10]),dir=pick([1,-1]);let s=step===5?5*ri(1,10):step===10?ri(1,9)+10*ri(0,2):ri(4,70);
+   let seq=[];for(let i=0;i<5;i++)seq.push(s+i*step);if(seq[4]>100){seq=seq.map(x=>x-20)}if(seq[0]<1){seq=seq.map(x=>x+20)}if(dir<0)seq.reverse();
+   const m=ri(2,4),a=seq[m];const shown=seq.map((x,i)=>i===m?'?':x).join(', ');return NUM({q:'What number is missing?',vis:sumVis(shown).replace('class="sum"','class="sum" style="font-size:clamp(1.5rem,6vw,2.2rem)"'),a,say:`What number is missing? ${seq.map((x,i)=>i===m?'blank':x).join(', ')}`,hint:`Look at how the numbers change. They go ${dir>0?'up':'down'} by the same amount each time.`,why:`The numbers go ${dir>0?'up':'down'} by ${step}. The missing number is ${a}.`})},
+ ordinal(){const n=ri(5,8),row=sample(Object.keys(ICONS),n),pos=ri(1,n),fromLeft=Math.random()<.6,idx=fromLeft?pos-1:n-pos,side=fromLeft?'left':'right',k=row[idx];
+   if(Math.random()<.65)return {kind:'tapicon',q:`Tap the ${ORN[pos]} picture from the ${side}.`,row,a:idx,hint:`Start at the ${side} and count: 1st, 2nd, 3rd...`,why:`Counting from the ${side}, the ${ORN[pos]} picture is the ${ICONS[k].n}.`};
+   return CH({q:`The ${ICONS[k].n} is in which place from the ${side}?`,vis:`<div class="iconrow">${row.map(x=>ic(x,42)).join('')}</div>`,a:pos,choices:numOpts(pos,[pos+1,pos-1,pos+2,pos-2,n+1-pos].filter(x=>x>=1&&x<=n)).map(c=>({l:ORN[c.v]||String(c.v),v:c.v})),hint:`Start at the ${side} and count.`,why:`Counting from the ${side}, the ${ICONS[k].n} is ${ORN[pos]}.`})},
+ bond10(){const a=ri(0,10),b=10-a,miss=pick(['a','b']);const ans=miss==='a'?a:b,known=miss==='a'?b:a;return NUM({q:`What number makes 10 with ${known}?`,vis:bond(10,a,b,miss),a:ans,hint:'Count on from the part you can see until you reach 10.',hv:frames(known,ans),why:`${known} and ${ans} make 10.`})},
+ bond20(){const w=ri(6,20),a=ri(1,w-1),b=w-a,m=pick(['w','a','b','a','b']);const ans=m==='w'?w:m==='a'?a:b;return NUM({q:m==='w'?`${a} and ${b} make what number?`:`What is the missing part?`,vis:bond(w,a,b,m),a:ans,say:m==='w'?undefined:`The whole is ${w}. One part is ${m==='a'?b:a}. What is the other part?`,hint:m==='w'?'Put the two parts together.':`Whole − part = other part.`,why:m==='w'?`${a} + ${b} = ${w}.`:`${w} − ${m==='a'?b:a} = ${ans}.`})},
+ add10(){if(Math.random()<.55){const a=ri(1,9),b=ri(1,10-a);return NUM({q:'What is the answer?',vis:sumVis(`${a} + ${b} = ?`),say:`${a} plus ${b}`,a:a+b,hint:'Count on from the bigger number.',hv:frames(a,b),why:`${a} + ${b} = ${a+b}.`})}
+   const a=ri(2,10),b=ri(1,a);return NUM({q:'What is the answer?',vis:sumVis(`${a} − ${b} = ?`),say:`${a} minus ${b}`,a:a-b,hint:'Cross out and count what is left.',hv:frames(a,0,b),why:`${a} − ${b} = ${a-b}.`})},
+ add20(){const a=ri(2,9),b=ri(11-a,9);const[x,y]=a>=b?[a,b]:[b,a];return NUM({q:'What is the answer?',vis:sumVis(`${a} + ${b} = ?`),say:`${a} plus ${b}`,a:a+b,hint:`Make 10 first. ${x} needs ${10-x}.`,hv:frames(x,y),why:makeTen(x,y)})},
+ sub20(){const a=ri(11,18),b=ri(a-9,9);return NUM({q:'What is the answer?',vis:sumVis(`${a} − ${b} = ?`),say:`${a} minus ${b}`,a:a-b,hint:`Split ${a} into 10 and ${a-10}. Take ${b} from the 10.`,hv:frames(a,0,b),why:subTen(a,b)})},
+ missing(){const r=ri(0,3),a=ri(2,9),b=ri(2,9),s=a+b;
+   if(r===0)return NUM({q:'What number goes in the box?',vis:sumVis(`? + ${b} = ${s}`),say:`Something plus ${b} equals ${s}.`,a,hint:`Think: ${s} − ${b}.`,why:`${s} − ${b} = ${a}, so ${a} + ${b} = ${s}.`});
+   if(r===1)return NUM({q:'What number goes in the box?',vis:sumVis(`${a} + ? = ${s}`),say:`${a} plus something equals ${s}.`,a:b,hint:`Think: ${s} − ${a}.`,why:`${s} − ${a} = ${b}, so ${a} + ${b} = ${s}.`});
+   if(r===2)return NUM({q:'What number goes in the box?',vis:sumVis(`${s} − ? = ${a}`),say:`${s} minus something equals ${a}.`,a:b,hint:`Think: ${a} + what makes ${s}?`,why:`${a} + ${b} = ${s}, so ${s} − ${b} = ${a}.`});
+   return NUM({q:`${a} + ${b} = ${s}. So what is ${s} − ${b}?`,a,hint:'Adding and subtracting use the same three numbers.',hv:bond(s,a,b,''),why:`${a}, ${b} and ${s} are a family. ${s} − ${b} = ${a}.`})},
+ three(){const a=ri(1,9),b=ri(1,9),c=ri(1,9);return NUM({q:'What is the answer?',vis:sumVis(`${a} + ${b} + ${c} = ?`),say:`${a} plus ${b} plus ${c}`,a:a+b+c,hint:'Add two numbers first. Look for two that make 10.',why:`${a} + ${b} = ${a+b}. ${a+b} + ${c} = ${a+b+c}.`})},
+ mental(){if(Math.random()<.5){const t=ri(1,9),o=ri(0,8),b=ri(1,9-o),a=t*10+o;return NUM({q:'Work this out in your head.',vis:sumVis(`${a} + ${b} = ?`),say:`${a} plus ${b}`,a:a+b,hint:'Add the ones only. The tens stay the same.',why:`${o} + ${b} = ${o+b}. The tens stay. ${a} + ${b} = ${a+b}.`})}
+   const a=ri(11,89),maxT=Math.floor((99-a)/10),t=ri(1,Math.max(1,maxT))*10;return NUM({q:'Work this out in your head.',vis:sumVis(`${a} + ${t} = ?`),say:`${a} plus ${t}`,a:a+t,hint:'Add the tens only. The ones stay the same.',why:`${Math.floor(a/10)} tens + ${t/10} tens = ${Math.floor(a/10)+t/10} tens. ${a} + ${t} = ${a+t}.`})},
+ addV(){let a,b;if(Math.random()<.6){do{a=ri(11,89);b=ri(11,89)}while(a+b>100||(a%10)+(b%10)<10)}else{do{a=ri(11,88);b=ri(11,88)}while(a+b>100||(a%10)+(b%10)>=10)}
+   return NUM({q:'Add. Start with the ones.',vis:vert(a,'+',b),say:`${a} plus ${b}`,a:a+b,hint:'Add the ones first. If you get 10 or more, carry 1 ten.',why:addParts(a,b)})},
+ subV(){let a,b;if(Math.random()<.6){do{a=ri(21,99);b=ri(11,a-1)}while((a%10)>=(b%10))}else{do{a=ri(21,99);b=ri(11,a-1)}while((a%10)<(b%10))}
+   return NUM({q:'Subtract. Start with the ones.',vis:vert(a,'−',b),say:`${a} minus ${b}`,a:a-b,hint:'Do the ones first. If the top number is too small, change 1 ten into 10 ones.',why:subParts(a,b)})},
+ xGroups(){const g=ri(2,5),n=ri(2,g===5?8:8),k=pick(THINGS),tot=g*n;
+   if(Math.random()<.7)return NUM({q:`There are ${g} groups of ${n}. How many ${PL[k]} altogether?`,vis:groupsV(g,n,k),a:tot,hint:`Add ${n} again and again: ${Array(g).fill(n).join(' + ')}.`,why:`${Array(g).fill(n).join(' + ')} = ${tot}. ${g} groups of ${n} is ${tot}.`});
+   const right=`${g} groups of ${n}`;const opts=[...new Set([`${n} groups of ${g}`,`${g+1} groups of ${n}`,`${g} groups of ${n+1}`])];return CH({q:'What does the picture show?',vis:groupsV(g,n,k),a:right,choices:shuffle([right,...opts.filter(o=>o!==right)]).slice(0,4).map(l=>({l,v:l})).sort(()=>Math.random()-.5),hint:'Count the circles first. That is the number of groups. Then count how many in one circle.',why:`There are ${g} circles with ${n} in each one.`})},
+ xMult(){const g=ri(2,10);let n=ri(2,10);while(g*n>40)n=ri(2,5);return NUM({q:'What is the answer?',vis:sumVis(`${g} × ${n} = ?`),say:`${g} times ${n}`,a:g*n,hint:`${g} × ${n} means ${g} groups of ${n}.`,why:`${g} groups of ${n}: ${g<=5?Array(g).fill(n).join(' + ')+' = ':''}${g*n}.`})},
+ share(){const k=pick([2,3,4,5]),each=ri(2,k===5?4:k===4?5:6),t=k*each,it=pick(THINGS);return {kind:'num',deal:{t,k,it},q:`Share ${t} ${PL[it]} equally on ${k} plates. How many on each plate?`,a:each,suf:'each',hint:'Tap the button to put one on each plate. Keep going until none are left.',why:`${t} shared equally among ${k} is ${each} each.`}},
+ makeGroups(){const n=pick([2,3,4,5]),g=ri(2,n===5?4:n===4?5:6),t=g*n,it=pick(THINGS);return NUM({q:`There are ${t} ${PL[it]}. You put ${n} in each box. How many boxes do you need?`,vis:tenBoxes(it,t),a:g,suf:'boxes',hint:`Count out ${n} at a time. How many times can you do that?`,hv:groupsV(g,n,it),why:`${Array(g).fill(n).join(' + ')} = ${t}. That is ${g} boxes.`})},
+ storyAS(){const [A,B]=two();const r=ri(0,5);
+   const P=(a,b)=>bars([{parts:[{l:a,w:Math.max(a,3)},{l:b,w:Math.max(b,3)}]}]);
+   if(r===0){const a=ri(8,40),b=ri(5,40);return NUM({q:`${A} has ${a} marbles. ${B} has ${b} marbles. How many marbles do they have altogether?`,a:a+b,hint:'Altogether means put the parts together. Add.',hv:bars([{parts:[{l:a,w:a},{l:b,w:b}]}],'?'),why:`${a} + ${b} = ${a+b}.`})}
+   if(r===1){const a=ri(12,45),b=ri(5,35);return NUM({q:`${a} people are on a bus. At the next stop, ${b} more people get on. How many people are on the bus now?`,a:a+b,hint:'More people get on, so the number goes up. Add.',hv:bars([{parts:[{l:a,w:a},{l:b,w:b}]}],'?'),why:`${a} + ${b} = ${a+b}.`})}
+   if(r===2){const a=ri(15,60),b=ri(4,a-3);return NUM({q:`${A} baked ${a} egg tarts. The family ate ${b} of them. How many egg tarts are left?`,a:a-b,hint:'Some are gone, so take away.',hv:bars([{parts:[{l:b,w:b},{l:'?',w:a-b,q:1}]}],a),why:`${a} − ${b} = ${a-b}.`})}
+   if(r===3){const a=ri(15,70),b=ri(4,a-3);return NUM({q:`There were ${a} otters by the river. ${b} otters swam away. How many otters are still there?`,a:a-b,hint:'Some swam away, so take away.',hv:bars([{parts:[{l:b,w:b},{l:'?',w:a-b,q:1}]}],a),why:`${a} − ${b} = ${a-b}.`})}
+   if(r===4){const w=ri(20,40),b=ri(8,w-6);return NUM({q:`There are ${w} children in a class. ${b} are boys. How many are girls?`,a:w-b,hint:'You know the whole and one part. Whole − part.',hv:bars([{parts:[{l:b,w:b},{l:'?',w:w-b,q:1}]}],w),why:`${w} − ${b} = ${w-b}.`})}
+   const a=ri(10,50),b=ri(5,40);return NUM({q:`${A} read ${a} pages on Monday and ${b} pages on Tuesday. How many pages did ${A} read in the two days?`,a:a+b,hint:'Put the two days together. Add.',hv:bars([{parts:[{l:a,w:a},{l:b,w:b}]}],'?'),why:`${a} + ${b} = ${a+b}.`})},
+ storyCmp(){const [A,B]=two(),r=ri(0,3);
+   if(r===0){const a=ri(8,50),d=ri(3,30);return NUM({q:`${A} has ${a} stickers. ${B} has ${d} more stickers than ${A}. How many stickers does ${B} have?`,a:a+d,hint:`${B} has more, so add.`,hv:bars([{who:A,parts:[{l:a,w:a}]},{who:B,parts:[{l:a,w:a},{l:d,w:d}]}]),why:`${a} + ${d} = ${a+d}.`})}
+   if(r===1){const a=ri(15,70),d=ri(3,a-4);return NUM({q:`${A} has ${a} stickers. ${B} has ${d} fewer stickers than ${A}. How many stickers does ${B} have?`,a:a-d,hint:`${B} has fewer, so take away.`,hv:bars([{who:A,parts:[{l:a-d,w:a-d},{l:d,w:d}]},{who:B,parts:[{l:'?',w:a-d,q:1}]}]),why:`${a} − ${d} = ${a-d}.`})}
+   if(r===2){const y=ri(8,40),d=ri(3,30),x=y+d;return NUM({q:`${A} folded ${x} paper cranes. ${B} folded ${y} paper cranes. How many more cranes did ${A} fold than ${B}?`,a:d,hint:'Find the difference. Bigger number − smaller number.',hv:bars([{who:A,parts:[{l:y,w:y},{l:'?',w:d,q:1}]},{who:B,parts:[{l:y,w:y}]}]),why:`${x} − ${y} = ${d}.`})}
+   const y=ri(8,40),d=ri(3,30),x=y+d;return NUM({q:`A ribbon is ${x} cm long. A string is ${y} cm long. How much shorter is the string than the ribbon?`,a:d,suf:'cm',hint:'Find the difference. Bigger number − smaller number.',hv:bars([{who:'ribbon',parts:[{l:y,w:y},{l:'?',w:d,q:1}]},{who:'string',parts:[{l:y,w:y}]}]),why:`${x} − ${y} = ${d} cm.`})},
+ storyMD(){const [A]=two(),r=ri(0,3);
+   if(r===0){const g=ri(2,5),n=ri(2,8);return NUM({q:`There are ${g} plates. Each plate has ${n} satay sticks. How many satay sticks are there altogether?`,a:g*n,hint:`${g} groups of ${n}.`,hv:groupsV(g,n,'satay'),why:`${g} × ${n} = ${g*n}.`})}
+   if(r===1){const g=ri(2,5),n=ri(2,8);return NUM({q:`${g} tables are at the hawker centre. ${n} people sit at each table. How many people are there altogether?`,a:g*n,hint:`${g} groups of ${n}.`,why:`${g} × ${n} = ${g*n}.`})}
+   if(r===2){const k=pick([2,3,4,5]),e=ri(2,k===2?9:k===5?4:5),t=k*e;return NUM({q:`${A} shares ${t} sweets equally among ${k} friends. How many sweets does each friend get?`,a:e,hint:`Give one to each friend, again and again.`,why:`${t} shared equally among ${k} is ${e} each.`})}
+   const n=pick([2,3,4,5]),g=ri(2,n===5?4:n===4?5:6),t=g*n;return NUM({q:`${A} has ${t} mangoes. ${A} packs ${n} mangoes in each bag. How many bags does ${A} need?`,a:g,hint:`Count out ${n} at a time.`,hv:groupsV(g,n,'mango'),why:`${Array(g).fill(n).join(' + ')} = ${t}. That is ${g} bags.`})},
+ cents(){let l,s;do{l=Array.from({length:ri(2,5)},()=>pick([5,10,20,50]));s=l.reduce((a,b)=>a+b,0)}while(s>100);l.sort((a,b)=>b-a);
+   return NUM({q:'How much money is there?',vis:coins(l),a:s,suf:'c',say:'How much money is there? Answer in cents.',hint:'Start with the biggest coin and count on.',why:`${l.map(c=>c+'c').join(' + ')} = ${s}c.`})},
+ dollars(){let l,s;do{l=Array.from({length:ri(2,5)},()=>pick([2,2,5,5,10,10,50]));s=l.reduce((a,b)=>a+b,0)}while(s>100);l.sort((a,b)=>b-a);
+   return NUM({q:'How much money is there?',vis:notes(l),a:s,pre:'$',say:'How much money is there? Answer in dollars.',hint:'Start with the biggest note and count on.',why:`${l.map(c=>'$'+c).join(' + ')} = $${s}.`})},
+ makeMoney(){if(Math.random()<.6){let s;do{s=Array.from({length:ri(2,4)},()=>pick([5,10,20,50])).reduce((a,b)=>a+b,0)}while(s>100);
+     return {kind:'money',q:`Tap the coins to make ${s}c.`,bank:[5,10,20,50],unit:'c',a:s,hint:'Start with the biggest coin that fits. Tap a coin in the tray to take it out.',why:`There are many ways. One way: ${greedy(s,[50,20,10,5]).map(c=>c+'c').join(' + ')}.`}}
+   let s;do{s=Array.from({length:ri(2,4)},()=>pick([2,5,10,50])).reduce((a,b)=>a+b,0)}while(s>100);
+   return {kind:'money',q:`Tap the notes to make $${s}.`,bank:[2,5,10,50],unit:'$',a:s,hint:'Start with the biggest note that fits. Tap a note in the tray to take it out.',why:`One way: ${noteWay(s).map(c=>'$'+c).join(' + ')}.`}},
+ moneyMore(){const r=ri(0,1);
+   if(r===0){const [A,B]=two();const mk=()=>{let l,s;do{l=Array.from({length:ri(2,4)},()=>pick([5,10,20,50]));s=l.reduce((a,b)=>a+b,0)}while(s>100);return{l:l.sort((a,b)=>b-a),s}};let x=mk(),y=mk();while(x.s===y.s)y=mk();const w=x.s>y.s?A:B;
+     return CH({q:'Who has more money?',vis:`<div class="purses"><div class="purse"><b>${A}</b>${coins(x.l)}</div><div class="purse"><b>${B}</b>${coins(y.l)}</div></div>`,a:w,choices:[{l:A,v:A},{l:B,v:B}],hint:'Count each set of coins. Then compare.',why:`${A} has ${x.s}c. ${B} has ${y.s}c. ${w} has more.`})}
+   const f=pick([['How many 10c coins make 50c?',5,'10 + 10 + 10 + 10 + 10 = 50.'],['How many 20c coins make $1?',5,'20 + 20 + 20 + 20 + 20 = 100. $1 is 100c.'],['How many 50c coins make $1?',2,'50 + 50 = 100. $1 is 100c.'],['How many cents make $1?',100,'$1 is 100 cents.'],['How many $2 notes make $10?',5,'2 + 2 + 2 + 2 + 2 = 10.'],['How many $5 notes make $10?',2,'5 + 5 = 10.'],['How many $10 notes make $50?',5,'10 + 10 + 10 + 10 + 10 = 50.'],['How many $50 notes make $100?',2,'50 + 50 = 100.']]);
+   return NUM({q:f[0],a:f[1],hint:'Count on until you reach the amount.',why:f[2]})},
+ lenRead(){const n=ri(2,15),o=pick(['pencil','crayon','ribbon','straw','stick']);return NUM({q:`How long is the ${o}?`,vis:ruler([{from:0,len:n,color:pick(['var(--cube1)','var(--cube2)','#3fae76'])}]),a:n,suf:'cm',hint:'The left end is at 0. Read the number at the right end.',why:`The right end is at ${n}. The ${o} is ${n} cm long.`})},
+ lenNear(){if(Math.random()<.6){const s=ri(1,6),n=ri(2,9),o=pick(['crayon','ribbon','straw']);return NUM({q:`Look carefully. This ${o} does not start at 0. How long is it?`,vis:ruler([{from:s,len:n,color:'#3fae76'}]),a:n,suf:'cm',hint:`It starts at ${s}. Count the jumps from ${s} to the other end.`,why:`From ${s} to ${s+n} is ${n} cm. ${s+n} − ${s} = ${n}.`})}
+   const n=ri(3,13),e=pick([-.3,-.2,.2,.3]);return NUM({q:'About how long is this pencil, to the nearest cm?',vis:ruler([{from:0,len:n+e,color:'var(--cube2)'}]),a:n,suf:'cm',hint:'Which number mark is the end closest to?',why:`The end is closest to ${n}. It is about ${n} cm long.`})},
+ lenCmp(){const cols=[['Red','#d8332b'],['Blue','#2f7fd6'],['Green','#3fae76']];const ns=sample([3,4,5,6,7,8,9,10,11,12,13,14],3),r=ri(0,2);const vis=ruler(ns.map((n,i)=>({from:0,len:n,color:cols[i][1]})));
+   if(r<2){const long=r===0,v=long?Math.max(...ns):Math.min(...ns),i=ns.indexOf(v);return CH({q:`Which ribbon is the ${long?'longest':'shortest'}?`,vis,a:cols[i][0],choices:cols.map(c=>({l:c[0],v:c[0]})),say:`Which ribbon is the ${long?'longest':'shortest'}? The top one is red, then blue, then green.`,hint:'Red is on top, then blue, then green. All start at 0, so look at the right ends.',why:`Red is ${ns[0]} cm, blue is ${ns[1]} cm, green is ${ns[2]} cm. ${cols[i][0]} is the ${long?'longest':'shortest'}.`})}
+   const[a,b]=sample([0,1,2],2),hi=ns[a]>ns[b]?a:b,lo=hi===a?b:a,d=ns[hi]-ns[lo];return NUM({q:`How much longer is the ${cols[hi][0].toLowerCase()} ribbon than the ${cols[lo][0].toLowerCase()} ribbon?`,vis,a:d,suf:'cm',hint:'Red is on top, then blue, then green. Read both lengths, then subtract.',why:`${ns[hi]} − ${ns[lo]} = ${d} cm.`})},
+ hourRead(){const h=ri(1,12),half=Math.random()<.5,m=half?30:0;const L=half?`half past ${h}`:`${h} o'clock`;
+   const opts=half?[`${h} o'clock`,`half past ${hw(h+1)}`,`half past ${hw(h-1)}`,`${hw(h+1)} o'clock`]:[`half past ${h}`,`${hw(h+1)} o'clock`,`${hw(h-1)} o'clock`,`half past ${hw(h-1)}`];
+   return CH({q:'What time does the clock show?',vis:clock(h,m),a:L,choices:txtOpts(L,opts),hint:half?'The long hand points to 6. That means half past. The short hand has just gone past the hour.':'The long hand points to 12. That means o\'clock. Read the short hand.',why:half?`The short hand is just past ${h} and the long hand is on 6. It is half past ${h}.`:`The short hand is on ${h} and the long hand is on 12. It is ${h} o'clock.`})},
+ fiveRead(){const h=ri(1,12),m=5*ri(1,11);if(Math.random()<.35)return NUM({q:`The clock shows some minutes past ${h}. How many minutes past ${h}?`,vis:clock(h,m),a:m,suf:'min',hint:'Count in 5s from 12 to the long hand.',why:`Counting in 5s to the long hand gives ${m} minutes.`});
+   const L=tf(h,m),opts=[tf(hw(h+1),m),tf(hw(h-1),m),tf(h,m===55?50:m+5),tf(h,m===5?10:m-5),tf(h,m===30?25:m===60-m?m+5:60-m)];
+   return CH({q:'What time does the clock show?',vis:clock(h,m),a:L,choices:txtOpts(L,[...new Set(opts)]),hint:'Read the short hand for the hour. It tells the hour it has passed. Count in 5s for the long hand.',why:`The short hand has passed ${h}. The long hand shows ${m} minutes. It is ${L}.`})},
+ setClock(){const h=ri(1,12),half=Math.random()<.35,m=half?30:5*ri(0,11);const label=m===0?`${h} o'clock`:m===30?`half past ${h}`:tf(h,m);
+   return {kind:'clock',q:`Set the clock to ${label}.`,a:{h,m},hint:'The long hand shows minutes. Each number is 5 minutes. Then set the hour.',why:`${label} has the long hand ${m===0?'on 12':'on '+(m/5)} and the short hand ${m===0?'on '+h:'just past '+h}.`}},
+ ampm(){const f=pick([['School starts at 7.30','a.m.'],['You eat dinner at 7.00','p.m.'],['Recess is at 10.00','a.m.'],['You go to bed at 9.00','p.m.'],['You wake up at 6.30','a.m.'],['School ends at 1.30','p.m.'],['You have breakfast at 7.00','a.m.'],['Your swimming lesson is in the afternoon at 3.00','p.m.'],['The family has supper at 8.30 at night','p.m.'],['The sun rises at about 7.00','a.m.']]);
+   return CH({q:`${f[0]} ___. Choose a.m. or p.m.`,a:f[1],choices:[{l:'a.m.',v:'a.m.'},{l:'p.m.',v:'p.m.'}],hint:'a.m. is from midnight to noon. p.m. is from noon to midnight.',why:`${f[0]} ${f[1]}. ${f[1]==='a.m.'?'That is before noon.':'That is after noon.'}`})},
+ duration(){const r=ri(0,3);
+   if(r===0){const f=pick([['1 h = ? min',60,'1 hour is 60 minutes.','1 hour equals how many minutes?'],['Half an hour = ? min',30,'Half of 60 minutes is 30 minutes.','Half an hour equals how many minutes?']]);return NUM({q:'How many minutes?',vis:sumVis(f[0]).replace('class="sum"','class="sum" style="font-size:clamp(1.4rem,5vw,2rem)"'),a:f[1],suf:'min',hint:'The long hand goes round once in 1 hour.',why:f[2]})}
+   const act=pick(['swimming lesson','piano lesson','movie','art class','football game']);
+   if(r===1){const h=ri(1,11),m=5*ri(0,5),[eh,em]=addMin(h,m,60);const L=tf(eh,em);return CH({q:`A ${act} starts at ${tf(h,m)}. It lasts 1 hour. When does it end?`,vis:clock(h,m),a:L,choices:txtOpts(L,[tf(...addMin(h,m,30)),tf(hw(h+2),m),tf(hw(h-1),m)]),hint:'1 hour later: the hour goes up by 1. The minutes stay the same.',why:`1 hour after ${tf(h,m)} is ${L}.`})}
+   if(r===2){const h=ri(1,11),m=5*ri(0,5),[eh,em]=addMin(h,m,30);const L=tf(eh,em);return CH({q:`A ${act} starts at ${tf(h,m)}. It lasts half an hour. When does it end?`,vis:clock(h,m),a:L,choices:txtOpts(L,[tf(...addMin(h,m,60)),tf(...addMin(h,m,5)),tf(...addMin(h,m,-30))]),hint:'Half an hour is 30 minutes. Add 30 to the minutes.',why:`30 minutes after ${tf(h,m)} is ${L}.`})}
+   const h=ri(1,11),half=Math.random()<.5,[eh,em]=addMin(h,0,half?30:60);const L=half?'half an hour':'1 hour';return CH({q:`A ${act} starts at ${tf(h,0)} and ends at ${tf(eh,em)}. How long is it?`,a:L,choices:txtOpts(L,['half an hour','1 hour','2 hours','5 minutes']),hint:'Count the minutes from the start to the end.',why:`From ${tf(h,0)} to ${tf(eh,em)} is ${half?'30 minutes, which is half an hour':'60 minutes, which is 1 hour'}.`})},
+ shapeName(){const k=pick(Object.keys(SHAPE_NAME)),v=ri(0,2),rot=pick([0,0,90,180,270,45]);const others=Object.keys(SHAPE_NAME);const L=SHAPE_NAME[k];
+   return CH({q:'What is this shape called?',vis:shape(k,v,k==='circle'?0:rot),a:L,choices:txtOpts(L,others.map(o=>SHAPE_NAME[o])).map(c=>({l:c.l,v:c.v})),hint:'Count its sides and corners. Is any side curved?',why:`This is a ${L}. Turning a shape does not change its name.`})},
+ shapeProp(){const r=ri(0,2);
+   if(r===0){const f=pick([['triangle','sides',3],['triangle','corners',3],['rectangle','sides',4],['rectangle','corners',4],['square','sides',4],['square','corners',4],['circle','corners',0]]);return NUM({q:`How many ${f[1]} does a ${f[0]} have?`,vis:shape(f[0],ri(0,2)),a:f[2],hint:'Touch each one on the picture and count.',why:`A ${f[0]} has ${f[2]} ${f[1]}.`})}
+   if(r===1){const f=pick([['Which shape has no corners?','circle'],['Which shape has 3 corners?','triangle'],['Which shape has 4 equal sides?','square'],['Which shape has one curved side and one straight side?','half'],['Which shape has one curved side and two straight sides?','quarter']]);const others=sample(Object.keys(SHAPE_NAME).filter(k=>k!==f[1]),3);
+     return CH({q:f[0],a:f[1],choices:shuffle([f[1],...others]).map(k=>({l:`${shape(k,ri(0,2))}<small>${SHAPE_NAME[k]}</small>`,v:k})),hint:'Look at the sides and corners of each shape.',why:`The answer is the ${SHAPE_NAME[f[1]]}.`})}
+   const k=pick(['triangle','square','rectangle','circle','half','quarter']),o=pick(Object.keys(SHAPE_NAME).filter(x=>x!==k));const list=shuffle([{v:'odd',l:shape(o,ri(0,2),pick([0,90,180]))},...[0,1,2].map(i=>({v:'k'+i,l:shape(k,i,k==='circle'?0:pick([0,90,180,45]))}))]);
+   return CH({q:`Which one is NOT a ${SHAPE_NAME[k]}?`,a:'odd',choices:list,hint:`A ${SHAPE_NAME[k]} can be big, small, or turned. Look for the one that is different.`,why:`The odd one out is a ${SHAPE_NAME[o]}.`})},
+ shapeFig(){const n=pick(Object.keys(FIGS)),parts=FIGS[n],kinds=[...new Set(parts.map(p=>p.k))],k=pick(kinds),c=parts.filter(p=>p.k===k).length;
+   return NUM({q:`How many ${PLURAL[k]} can you find in this picture?`,vis:figure(n),a:c,hint:'Touch each one as you count it. Check for small ones too.',why:`There ${c===1?'is':'are'} ${c} ${c===1?SHAPE_NAME[k]:PLURAL[k]}.`})},
+ graphQ(mode){const T=pick([{t:'Fruit at a market stall',o:[['rambutan','Rambutans'],['mango','Mangoes'],['durian','Durians']]},
+   {t:'Food sold at a stall this morning',o:[['tart','Egg tarts'],['pau','Pau'],['kueh','Ang ku kueh'],['satay','Satay sticks']]},
+   {t:'Things seen at the river',o:[['otter','Otters'],['fish','Fish'],['orchid','Orchids']]},
+   {t:'Snacks at a class picnic',o:[['mango','Mangoes'],['pau','Pau'],['merl','Ice creams'],['tart','Egg tarts']]}]);
+   const opts=T.o;
+   const vals=sample([1,2,3,4,5,6,7,8,9],opts.length);const rows=opts.map((o,i)=>({l:o[1],k:o[0],v:vals[i]}));
+   const vis=`<b style="text-align:center">${T.t}</b>${graphV(rows)}<div class="key-line">Each picture stands for 1.</div>`;
+      if(mode==='read'){const r=pick(rows);return NUM({q:`How many ${r.l.toLowerCase()} are there?`,vis,a:r.v,hint:'Find the row, then count the pictures.',why:`There are ${r.v} pictures in the ${r.l} row.`})}
+   if(mode==='most'){const big=Math.random()<.5,v=big?Math.max(...vals):Math.min(...vals),r=rows[vals.indexOf(v)];return CH({q:`Which has the ${big?'most':'fewest'}?`,vis,a:r.l,choices:rows.map(x=>({l:x.l,v:x.l})),hint:`Look for the ${big?'longest':'shortest'} row of pictures.`,why:`${r.l} has ${v}. It is the ${big?'longest':'shortest'} row.`})}
+   const [x,y]=sample(rows,2),hi=x.v>y.v?x:y,lo=hi===x?y:x;
+   if(Math.random()<.6)return NUM({q:`How many more ${hi.l.toLowerCase()} than ${lo.l.toLowerCase()} are there?`,vis,a:hi.v-lo.v,hint:'Count both rows. Then subtract.',why:`${hi.v} − ${lo.v} = ${hi.v-lo.v}.`});
+   return NUM({q:`How many ${x.l.toLowerCase()} and ${y.l.toLowerCase()} are there altogether?`,vis,a:x.v+y.v,hint:'Count both rows. Then add.',why:`${x.v} + ${y.v} = ${x.v+y.v}.`})}
+};
+function greedy(s,den){const out=[];for(const c of den){while(s>=c){out.push(c);s-=c}}return out}
+function noteWay(s){const out=[];while(s>=50){out.push(50);s-=50}while(s>=10){out.push(10);s-=10}if(s%2===1){out.push(5);s-=5}while(s>=2){out.push(2);s-=2}return out}
+
+/* ---------- curriculum ---------- */
+const T=x=>`<span class="t">${x}</span>`;
+const SMALL=h=>h.replace('class="sum"','class="sum" style="font-size:clamp(1.5rem,6vw,2.2rem)"');
+const C=i=>`.bond circle@${i}`,FI=r=>`.frame i@${r}`,V=i=>`.vert>*@${i}`,CT=i=>`.clk text@${i}`,RT=i=>`.rul text@${i}`,OB=i=>`.rul rect:not(.body)@${i}`,S_=i=>`.seg@${i}`,CO=i=>`.coin@${i}`,MD=i=>`.moneyrow>div@${i}`,MS=i=>`.moneyrow>svg@${i}`,SH=i=>`.fig .shp@${i}`,ICN=i=>`.iconrow svg@${i}`,GP=i=>`.group@${i}`,RW=i=>`.rw@${i}`,TK=i=>`.t@${i}`;
+const ROW4=`<div class="iconrow">${['otter','bus','mango','fish'].map(k=>ic(k,42)).join('')}</div>`;
+const STATIONS=[
+{id:'n1',code:'N1',c:'--red',name:'Numbers to 100',mission:'Collect 100 small things such as pebbles or LEGO. Pack them into groups of ten and count: 10, 20, 30...',skills:[
+ {id:'count',t:'Count in tens and ones',g:'count',learn:[{t:'Big numbers are easier to count in groups of ten. Each tall stick has 10 cubes.',v:rods(3,0),c:[['stick','.rod']]},{t:'Count the tens: 10, 20, 30. Then count on the small cubes: 31, 32, 33, 34.',v:rods(3,4)+sumVis('34'),c:[['10','.rod@0'],['20','.rod@1'],['30','.rod@2'],['31','.one@0'],['32','.one@1'],['33','.one@2'],['34',['.one@3','.sum']]]}]},
+ {id:'place',t:'Tens and ones',g:'place',learn:[{t:'A two-digit number has a tens digit and a ones digit. In 47, the 4 means 4 tens and the 7 means 7 ones.',v:rods(4,7)+sumVis('47'),c:[['tens','.rod',1],['ones','.one',1],['47','.sum',1],['tens','.rod',1],['ones','.one',1]]}]},
+ {id:'words',t:'Number words',g:'words',learn:[{t:'Say the tens word, then the ones word. 47 is forty-seven. We join them with a short line.',v:sumVis('47')+'<p><b>forty-seven</b></p>',c:[['47','.sum',1],['forty-seven','.card > .vis > p',1]]},{t:'Tens words: twenty, thirty, forty, fifty, sixty, seventy, eighty, ninety.'}]},
+ {id:'compare',t:'Compare and order',g:'compare',learn:[{t:'Look at the tens first. 52 is greater than 38 because 5 tens is more than 3 tens.',v:sumVis(`${T(52)} , ${T(38)}`),c:[['52',TK(0),1],['38',TK(1),1],['5',TK(0),1],['3',TK(1),1]]},{t:'If the tens are the same, look at the ones. 64 is greater than 61.',v:sumVis(`${T(64)} , ${T(61)}`),c:[['64',TK(0),1],['61',TK(1),1]]},{t:'10 more changes the tens digit by 1. 10 more than 45 is 55. 1 more changes the ones digit. 1 more than 45 is 46.',v:sumVis(`${T(45)} → ${T(55)} , ${T(46)}`),c:[['45',TK(0),1],['55',TK(1)],['45',TK(0),1],['46',TK(2)]]}]},
+ {id:'pattern',t:'Number patterns',g:'pattern',learn:[{t:'Find how the numbers change. 15, 20, 25, 30. These go up by 5 each time.',v:SMALL(sumVis([15,20,25,30].map(T).join(', '))),c:[['15',TK(0)],['20',TK(1)],['25',TK(2)],['30',TK(3)]]},{t:'Patterns can go down too. 70, 60, 50, 40. These go down by 10 each time.',v:SMALL(sumVis([70,60,50,40].map(T).join(', '))),c:[['70',TK(0)],['60',TK(1)],['50',TK(2)],['40',TK(3)]]}]},
+ {id:'ordinal',t:'1st, 2nd, 3rd...',g:'ordinal',learn:[{t:'First, second, third and so on tell us the position in a line. Always check where you start counting.',v:ROW4,c:[['First',ICN(0)],['second',ICN(1)],['third',ICN(2)]]},{t:'From the left, the otter is 1st and the mango is 3rd. From the right, the fish is 1st and the mango is 2nd.',v:ROW4,c:[['otter',ICN(0),1],['mango',ICN(2),1],['fish',ICN(3),1],['mango',ICN(2),1]]}]}
+]},
+{id:'n2',code:'N2',c:'--red',name:'Number Bonds',mission:'Put 10 sweets on the table. Split them onto two plates in every way you can. Say each bond out loud: 3 and 7 make 10.',skills:[
+ {id:'bond10',t:'Make 10',g:'bond10',learn:[{t:'A number bond shows a whole and its two parts. 3 and 7 make 10.',v:bond(10,3,7,''),c:[['whole',C(0),1],['parts',C('1-2'),1],['3',C(1),1],['7',C(2)],['10',C(0)]]},{t:'Make 10 pairs are very useful: 1 and 9, 2 and 8, 3 and 7, 4 and 6, 5 and 5.',v:frames(4,6),c:[['4',FI('0-3'),1],['6',FI('4-9')]]}]},
+ {id:'bond20',t:'Bonds to 20',g:'bond20',learn:[{t:'Any number can be split into two parts. 14 can be 10 and 4, or 8 and 6.',v:bond(14,8,6,''),c:[['parts',C('1-2'),1],['14',C(0),1],['8',C(1),1],['6',C(2)]]},{t:'To find a missing part, take the part you know away from the whole. 14 − 8 = 6.',v:bond(14,8,6,'b'),c:[['missing',C(2),1],['know',C(1),1],['whole',C(0),1],['14',C(0),1],['8',C(1)],['6',C(2)]]}]}
+]},
+{id:'n3',code:'N3',c:'--red',name:'Add and Subtract to 20',mission:'Roll two dice and add the numbers. Then write the two subtraction facts that go with it.',skills:[
+ {id:'add10',t:'Within 10',g:'add10',learn:[{t:'Adding puts parts together. Start with the bigger number and count on. 6 + 3: 7, 8, 9.',v:frames(6,3),c:[['bigger',FI('0-5'),1],['7',FI(6)],['8',FI(7)],['9',FI(8)]]},{t:'Subtracting takes away. 9 − 3 leaves 6.',v:frames(9,0,3),c:[['away',FI('6-8'),1],['9',FI('0-8'),1],['3',FI('6-8'),1],['6',FI('0-5'),1]]}]},
+ {id:'add20',t:'Add by making 10',g:'add20',learn:[{t:'8 + 5. The 8 needs 2 more to make 10. Take 2 from the 5.',v:frames(8,5),c:[['8',FI('0-7'),1],['5',FI('8-12')],['8',FI('0-7'),1],['2',FI('8-9')],['10',FI('0-9'),1],['2',FI('8-9'),1],['5',FI('8-12'),1]]},{t:'Now you have 10 and 3 left over. 10 + 3 = 13.',v:frames(8,5)+sumVis('8 + 5 = 13'),c:[['10',FI('0-9'),1],['3',FI('10-12')],['13','.sum']]}]},
+ {id:'sub20',t:'Subtract from 10',g:'sub20',learn:[{t:'13 − 5. Split 13 into 10 and 3.',v:bond(13,10,3,''),c:[['Split',C(0),1],['10',C(1),1],['3',C(2)]]},{t:'Take 5 from the 10. 10 − 5 = 5. Then add the 3 back. 5 + 3 = 8.',v:bond(13,10,3,'')+sumVis('13 − 5 = 8'),c:[['10',C(1),1],['3',C(2),1],['8','.sum',1]]}]},
+ {id:'missing',t:'Missing numbers',g:'missing',learn:[{t:'Three numbers can make a family. 4 and 7 make 11.',v:bond(11,4,7,''),c:[['4',C(1),1],['7',C(2)],['11',C(0)]]},{t:'So 4 + 7 = 11, 7 + 4 = 11, 11 − 4 = 7 and 11 − 7 = 4. Use the family to find a missing number.',v:bond(11,4,7,''),c:[['4',C(1),1],['7',C(2)],['11',C(0)],['7',C(2),1],['4',C(1)],['11',C(0)],['11',C(0),1],['4',C(1)],['7',C(2)],['11',C(0),1],['7',C(2)],['4',C(1)]]}]},
+ {id:'three',t:'Add three numbers',g:'three',learn:[{t:'Add two numbers first, then add the third. Look for a pair that makes 10.',v:sumVis(`${T(6)} + ${T(5)} + ${T(4)}`),c:[['pair',[TK(0),TK(2)],1]]},{t:'6 + 4 = 10. Then 10 + 5 = 15.',v:sumVis(`${T(6)} + ${T(5)} + ${T(4)} = ${T(15)}`),c:[['6',TK(0),1],['4',TK(2)],['5',TK(1),1],['15',TK(3)]]}]}
+]},
+{id:'n4',code:'N4',c:'--red',name:'Add and Subtract to 100',mission:'Add up family ages or page numbers on paper. Line up tens under tens and ones under ones.',skills:[
+ {id:'mental',t:'Add in your head',g:'mental',learn:[{t:'Adding ones: only the ones change. 42 + 5: 2 + 5 = 7, so the answer is 47.',v:sumVis(`${T(42)} + ${T(5)} = ${T(47)}`),c:[['42',TK(0),1],['5',TK(1)],['47',TK(2)]]},{t:'Adding tens: only the tens change. 42 + 30: 4 tens + 3 tens = 7 tens, so the answer is 72.',v:sumVis(`${T(42)} + ${T(30)} = ${T(72)}`),c:[['42',TK(0),1],['30',TK(1)],['72',TK(2)]]}]},
+ {id:'addV',t:'Add with carrying',g:'addV',learn:[{t:'Line up tens and ones. Add the ones first. 7 + 5 = 12.',v:vert(37,'+',25),c:[['tens',[V(4),V(7)],1],['ones',[V(5),V(8)],1],['7',V(5),1],['5',V(8)]]},{t:'12 is 1 ten and 2 ones. Write 2 and carry the 1 ten.',v:vert(37,'+',25,'?2'),c:[['Write',V(12),1],['carry',[V(4),V(7)],1]]},{t:'Add the tens with the carried ten. 3 + 2 + 1 = 6. The answer is 62.',v:vert(37,'+',25,62),c:[['3',V(4),1],['2',V(7)],['6',V(11)],['62',[V(11),V(12)],1]]}]},
+ {id:'subV',t:'Subtract with renaming',g:'subV',learn:[{t:'Start with the ones. 3 − 8 is not possible, so change 1 ten into 10 ones.',v:vert(53,'−',28),c:[['ones',[V(5),V(8)],1],['3',V(5),1],['8',V(8)],['ten',V(4),1]]},{t:'Now the ones are 13. 13 − 8 = 5. The tens are 4. 4 − 2 = 2. The answer is 25.',v:vert(53,'−',28,25),c:[['ones',V(5),1],['8',V(8)],['5',V(12)],['tens',V(4),1],['2',V(7)],['2',V(11)],['25',[V(11),V(12)],1]]}]}
+]},
+{id:'n5',code:'N5',c:'--red',name:'Multiply and Divide',mission:'Set the table or pack snacks. Make 4 plates with 3 grapes each and count how many altogether. Then share 12 grapes equally.',skills:[
+ {id:'xGroups',t:'Equal groups',g:'xGroups',learn:[{t:'Equal groups have the same number in each group. Here are 3 groups of 4.',v:groupsV(3,4,'mango'),c:[['3','.group',1],['4',GP(0),1]]},{t:'4 + 4 + 4 = 12. So 3 groups of 4 make 12.',v:groupsV(3,4,'mango')+sumVis('4 + 4 + 4 = 12'),c:[['4',GP(0),1],['4',GP(1)],['4',GP(2)],['12','.sum']]}]},
+ {id:'xMult',t:'Multiply with ×',g:'xMult',learn:[{t:'The sign × means groups of. 3 × 4 means 3 groups of 4.',v:groupsV(3,4,'mango')+sumVis('3 × 4 = 12'),c:[['means','.group',1],['3','.group',1],['4',GP(0),1]]},{t:'You can always add to work it out. 5 × 2 is 2 + 2 + 2 + 2 + 2 = 10.',v:groupsV(5,2,'pau'),c:[['5','.group',1],['is',GP(0),1],['+',GP(1)],['+',GP(2)],['+',GP(3)],['+',GP(4)],['10','.group',1]]}]},
+ {id:'share',t:'Share equally',g:'share',learn:[{t:'To share equally, give one to each plate, again and again. Stop when none are left.',v:plates([3,3,3,3],'kueh'),c:[['one','.plate svg:nth-child(1)'],['again','.plate svg:nth-child(2)'],['again','.plate svg:nth-child(3)']]},{t:'12 kueh shared equally on 4 plates makes 3 on each plate.',v:plates([3,3,3,3],'kueh'),c:[['12','.plate svg',1],['4','.plate',1],['3','.plate@0',1]]}]},
+ {id:'makeGroups',t:'Make equal groups',g:'makeGroups',learn:[{t:'Sometimes you know how many go in each group. Count out that number again and again.',v:groupsV(3,5,'pau'),c:[['each',GP(0),1],['again',GP(1)],['again',GP(2)]]},{t:'15 pau with 5 in each box needs 3 boxes.',v:groupsV(3,5,'pau'),c:[['15','.group',1],['5',GP(0),1],['3','.group',1]]}]}
+]},
+{id:'n6',code:'N6',c:'--red',name:'Story Sums',mission:'Make up a story sum together about today, then swap and solve each other’s sums.',skills:[
+ {id:'storyAS',t:'Altogether and left',g:'storyAS',learn:[{t:'Read the story. Altogether means add the parts. Left means take away.',v:bars([{parts:[{l:12,w:12},{l:7,w:7}]}],'?'),c:[['Altogether','.total',1],['parts','.seg',1],['Left',S_(1),1]]},{t:'Draw a bar to help you see the parts and the whole. 12 + 7 = 19.',v:bars([{parts:[{l:12,w:12},{l:7,w:7}]}],19),c:[['parts','.seg',1],['whole','.total',1],['12',S_(0),1],['7',S_(1)],['19','.total']]}]},
+ {id:'storyCmp',t:'More and fewer',g:'storyCmp',learn:[{t:'Compare two amounts. If one has more, draw a longer bar. The extra part is the difference.',v:bars([{who:'Ali',parts:[{l:8,w:8},{l:'5',w:5}]},{who:'Mei',parts:[{l:8,w:8}]}]),c:[['longer',[S_(0),S_(1)],1],['extra',S_(1),1]]},{t:'Ali has 13 and Mei has 8. Ali has 5 more than Mei. 13 − 8 = 5.',v:bars([{who:'Ali',parts:[{l:8,w:8},{l:'5',w:5}]},{who:'Mei',parts:[{l:8,w:8}]}]),c:[['13',[S_(0),S_(1)],1],['8',S_(2),1],['5',S_(1),1]]}]},
+ {id:'storyMD',t:'Groups and sharing',g:'storyMD',learn:[{t:'Each and every often means equal groups. 4 boxes with 3 in each box is 4 × 3 = 12.',v:groupsV(4,3,'tart'),c:[['groups','.group',1],['4','.group',1],['3',GP(0),1],['12','.group',1]]},{t:'Shared equally means give the same number to each one.',v:plates([3,3,3],'tart'),c:[['same','.plate']]}]}
+]},
+{id:'m7',code:'M7',c:'--amber',name:'Money',mission:'Let your child count coins at a kopitiam or hawker stall. Sort a jar of coins and count them by value.',skills:[
+ {id:'cents',t:'Count coins',g:'cents',learn:[{t:'Singapore coins are 5c, 10c, 20c, 50c and $1. 100c is the same as $1.',v:coins([5,10,20,50,100]),c:[['5c',CO(0)],['10c',CO(1)],['20c',CO(2)],['50c',CO(3)],['$1',CO(4)],['100c',CO(4),1]]},{t:'Start with the biggest coin and count on. 50c, 70c, 80c, 85c.',v:coins([50,20,10,5])+sumVis('85c'),c:[['biggest',CO(0),1],['50c',CO(0),1],['70c',CO(1)],['80c',CO(2)],['85c',[CO(3),'.sum']]]}]},
+ {id:'dollars',t:'Count notes',g:'dollars',learn:[{t:'We count notes in dollars. Start with the biggest note and count on. $10, $15, $17.',v:notes([10,5,2])+sumVis('$17'),c:[['biggest','.note@0',1],['$10','.note@0',1],['$15','.note@1'],['$17',['.note@2','.sum']]]}]},
+ {id:'makeMoney',t:'Make an amount',g:'makeMoney',learn:[{t:'To make 35c, start with the biggest coin that fits. 20c, then 10c, then 5c.',v:coins([20,10,5])+sumVis('35c'),c:[['35c','.sum',1],['biggest',CO(0),1],['20c',CO(0),1],['10c',CO(1)],['5c',[CO(2),'.sum']]]},{t:'There is often more than one way. 10c, 10c, 10c, 5c also makes 35c.',v:coins([10,10,10,5]),c:[['10c',CO(0)],['10c',CO(1)],['10c',CO(2)],['5c',CO(3)]]}]},
+ {id:'moneyMore',t:'Who has more?',g:'moneyMore',learn:[{t:'More coins does not always mean more money. Count how much each set is worth.',v:`<div class="purses"><div class="purse"><b>A: 3 coins</b>${coins([5,5,5])}</div><div class="purse"><b>B: 1 coin</b>${coins([20])}</div></div>`,c:[['coins','.purse@0',1],['money','.purse@1',1]]},{t:'A has 15c. B has 20c. B has more money.',v:`<div class="purses"><div class="purse"><b>A: 15c</b>${coins([5,5,5])}</div><div class="purse"><b>B: 20c</b>${coins([20])}</div></div>`,c:[['A','.purse@0',1],['B','.purse@1',1],['B','.purse@1',1]]}]}
+]},
+{id:'l8',code:'L8',c:'--green',name:'Length',mission:'Use a real ruler. Measure 5 things at home, then draw lines of 5 cm, 9 cm and 12 cm. Start from the 0 mark.',skills:[
+ {id:'lenRead',t:'Read a ruler',g:'lenRead',learn:[{t:'We measure length in centimetres, written cm. Line up one end with 0.',v:ruler([{from:0,len:7,color:'var(--cube1)'}]),c:[['length',OB(0),1],['0',RT(0),1]]},{t:'Read the number at the other end. This pencil is 7 cm long.',v:ruler([{from:0,len:7,color:'var(--cube1)'}]),c:[['end',RT(7),1],['pencil',OB(0),1],['7',RT(7)]]}]},
+ {id:'lenNear',t:'Tricky measuring',g:'lenNear',learn:[{t:'If an object does not start at 0, count the jumps between its two ends. From 3 to 8 is 5 cm.',v:ruler([{from:3,len:5,color:'#3fae76'}]),c:[['0',RT(0),1],['3',RT(3),1],['8',RT(8)],['5',OB(0)]]},{t:'If an end is not exactly on a mark, use the closest mark. This is called the nearest cm. This pencil is about 6 cm.',v:ruler([{from:0,len:6.2,color:'var(--cube2)'}]),c:[['closest',RT(6),1],['6',RT(6),1]]}]},
+ {id:'lenCmp',t:'Longer and shorter',g:'lenCmp',learn:[{t:'Compare lengths in cm. The bigger number is longer. To find how much longer, subtract.',v:ruler([{from:0,len:11,color:'#d8332b'},{from:0,len:7,color:'#2f7fd6'}]),c:[['longer',OB(0),1],['subtract',OB('0-1'),1]]},{t:'Red is 11 cm and blue is 7 cm. 11 − 7 = 4. Red is 4 cm longer.',v:ruler([{from:0,len:11,color:'#d8332b'},{from:0,len:7,color:'#2f7fd6'}]),c:[['Red',[OB(0),RT(11)],1],['blue',[OB(1),RT(7)],1],['Red',OB(0),1]]}]}
+]},
+{id:'t9',code:'T9',c:'--green',name:'Time',mission:'At each meal, look at a clock with hands. Read the time together and say a.m. or p.m.',skills:[
+ {id:'hourRead',t:'O’clock and half past',g:'hourRead',learn:[{t:'The short hand shows the hour. The long hand shows the minutes. Long hand on 12 means o’clock. This is 3 o’clock.',v:clock(3,0),c:[['short','.hh',1],['long','.mh',1],['12',['.mh',CT(11)],1],['3',['.hh',CT(2)],1]]},{t:'Long hand on 6 means half past. The short hand has moved halfway to the next number. This is half past 3.',v:clock(3,30),c:[['6',['.mh',CT(5)],1],['short','.hh',1],['3',['.hh',CT(2)],1]]}]},
+ {id:'fiveRead',t:'Read to 5 minutes',g:'fiveRead',learn:[{t:'Each number on the clock is 5 minutes. Count in 5s from 12: 5, 10, 15, 20...',v:clock(4,20),c:[['12',CT(11),1],['5',CT(0)],['10',CT(1)],['15',CT(2)],['20',[CT(3),'.mh']]]},{t:'The short hand has passed 4. The long hand shows 20 minutes. We write the time as 4.20.',v:clock(4,20)+sumVis('4.20'),c:[['short','.hh',1],['4',CT(3)],['long','.mh',1],['4.20','.sum',1]]}]},
+ {id:'setClock',t:'Set the clock',g:'setClock',learn:[{t:'Tap to move the hands. Move the minutes first, then the hour. This clock shows 8.15.',v:clock(8,15),c:[['minutes','.mh',1],['hour','.hh',1]]}]},
+ {id:'ampm',t:'a.m. and p.m.',g:'ampm',learn:[{t:'a.m. is from midnight to noon. You wake up at 6.30 a.m.'},{t:'p.m. is from noon to midnight. You go to bed at 9.00 p.m.'}]},
+ {id:'duration',t:'How long?',g:'duration',learn:[{t:'1 hour is 60 minutes. We write 1 h = 60 min. One hour after 2.15 is 3.15.',v:SMALL(sumVis('1 h = 60 min').replace(/font-size:[^"]+/,'font-size:clamp(1.4rem,5vw,2rem)')),c:[['write','.sum',1]]},{t:'Half an hour is 30 minutes. Half an hour after 2.15 is 2.45.',v:clock(2,15)+clock(2,45),c:[['2.15','.clk@0',1],['2.45','.clk@1',1]]}]}
+]},
+{id:'s10',code:'S10',c:'--purple',name:'Shapes',mission:'Find shapes around the house. Then draw a house or robot using shapes on dotted or square grid paper.',skills:[
+ {id:'shapeName',t:'Name the shapes',g:'shapeName',learn:[{t:'These are the shapes for P1: square, rectangle, triangle, circle, half circle and quarter circle.',v:`<div class="moneyrow">${Object.keys(SHAPE_NAME).map(k=>`<div style="text-align:center;width:112px">${shape(k)}<br><b>${SHAPE_NAME[k]}</b></div>`).join('')}</div>`,c:[['square',MD(0),1],['rectangle',MD(1),1],['triangle',MD(2),1],['circle',MD(3),1],['half',MD(4),1],['quarter',MD(5),1]]},{t:'A shape keeps its name when it is turned, or when it is big or small. These are both squares.',v:`<div class="moneyrow">${shape('square')}${shape('square',0,45)}</div>`,c:[['turned',MS(1),1],['squares',MS('0-1'),1]]}]},
+ {id:'shapeProp',t:'Sides and corners',g:'shapeProp',learn:[{t:'A triangle has 3 sides and 3 corners. A rectangle has 4 sides and 4 corners.',v:`<div class="moneyrow">${shape('triangle')}${shape('rectangle')}</div>`,c:[['triangle',MS(0),1],['rectangle',MS(1),1]]},{t:'A square has 4 equal sides. A circle has no corners at all.',v:`<div class="moneyrow">${shape('square')}${shape('circle')}</div>`,c:[['square',MS(0),1],['circle',MS(1),1]]}]},
+ {id:'shapeFig',t:'Shapes in pictures',g:'shapeFig',learn:[{t:'Pictures can be made of shapes. This house has squares, a triangle, a rectangle and a quarter circle in the corner.',v:figure('house'),c:[['squares',[SH(0),SH(3),SH(4)],1],['triangle',SH(1),1],['rectangle',SH(2),1],['quarter',SH(5),1]]},{t:'Touch each shape as you count, so you do not count it twice.',v:figure('house'),c:[['each',SH(0),1],['count',SH(1)]]}]}
+]},
+{id:'g11',code:'G11',c:'--blue',name:'Picture Graphs',mission:'Ask family members their favourite food. Draw one picture per person to make your own graph.',skills:[
+ {id:'graphRead',t:'Read a graph',g:'graphRead',learn:[{t:'A picture graph uses pictures to show how many. Each picture here stands for 1.',v:graphV([{l:'Mango',k:'mango',v:5},{l:'Durian',k:'durian',v:3}]),c:[['pictures','.rw svg',1],['Each','.rw svg@0',1]]},{t:'Count the pictures in a row: 1, 2, 3, 4, 5. There are 5 mangoes.',v:graphV([{l:'Mango',k:'mango',v:5},{l:'Durian',k:'durian',v:3}]),c:[['1','.rw svg@0'],['2','.rw svg@1'],['3','.rw svg@2'],['4','.rw svg@3'],['5','.rw svg@4']]}]},
+ {id:'graphMost',t:'Most and fewest',g:'graphMost',learn:[{t:'The longest row has the most. The shortest row has the fewest.',v:graphV([{l:'Egg tart',k:'tart',v:6},{l:'Pau',k:'pau',v:2},{l:'Kueh',k:'kueh',v:4}]),c:[['longest',RW(0),1],['shortest',RW(1),1]]}]},
+ {id:'graphDiff',t:'How many more?',g:'graphDiff',learn:[{t:'To find how many more, subtract. To find altogether, add.',v:graphV([{l:'Otters',k:'otter',v:7},{l:'Fish',k:'fish',v:3}]),c:[['more',RW(0),1],['altogether','.rw',1]]},{t:'7 − 3 = 4, so there are 4 more otters than fish. 7 + 3 = 10 animals altogether.',v:graphV([{l:'Otters',k:'otter',v:7},{l:'Fish',k:'fish',v:3}]),c:[['7',RW(0),1],['3',RW(1)],['otters',RW(0),1],['fish',RW(1),1],['7',RW(0),1],['3',RW(1)]]}]}
+]}
+];
+G.graphRead=()=>G.graphQ('read');G.graphMost=()=>G.graphQ('most');G.graphDiff=()=>G.graphQ('diff');
+const SK={};STATIONS.forEach(s=>s.skills.forEach(k=>{SK[k.id]={...k,st:s}}));
+
+/* ---------- state ---------- */
+const LS='p1-math-line-v1',today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const blank=()=>({v:1,t:0,sk:{},stamps:[],last:'',sound:true,autoRead:false,readLessons:true,voice:''});
+let S=blank();try{const r=localStorage.getItem(LS);if(r)S={...blank(),...JSON.parse(r)}}catch(e){}
+let dbRef=null,dbBusy=false,dbDirty=false,syncState='device';
+function save(){S.t=Date.now();try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}syncOut()}
+async function syncOut(){if(!dbRef)return;if(dbBusy){dbDirty=true;return}dbBusy=true;try{await dbRef.set(JSON.parse(JSON.stringify(S)));syncState='account'}catch(e){if(e&&e.code==='unavailable'){dbDirty=true}else{dbRef=null;syncState='device'}}dbBusy=false;if(dbDirty&&dbRef){dbDirty=false;setTimeout(syncOut,1500)}}
+async function initDb(){try{if(!window.claude||!claude.use)return;const db=await claude.use('db');if(!db)return;const ref=db.doc('progress/p1');const snap=await ref.get();dbRef=ref;syncState='account';if(snap.exists){const d=snap.data();if((d.t||0)>S.t){S={...blank(),...JSON.parse(JSON.stringify(d))};try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}if(view.name==='home'||view.name==='parent')render()}else if(S.t>(d.t||0))syncOut()}else if(S.t)syncOut()}catch(e){}}
+
+const rec=id=>S.sk[id]||(S.sk[id]={s:0,r:0,n:0});
+const stnStars=s=>s.skills.reduce((a,k)=>a+((S.sk[k.id]||{}).s||0),0);
+const totalStars=()=>STATIONS.reduce((a,s)=>a+stnStars(s),0);
+const maxStars=()=>Object.keys(SK).length*3;
+
+/* ---------- sound and speech ---------- */
+let ac;function tone(freqs,dur=.14,type='sine'){if(!S.sound)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();freqs.forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;const t=ac.currentTime+i*dur;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.18,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+dur*1.5);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+dur*1.6)})}catch(e){}}
+const sfx={ok:()=>tone([659,880]),no:()=>tone([220],.2,'triangle'),end:()=>tone([523,659,784,1047],.16)};
+const canSpeak=()=>{try{return 'speechSynthesis' in window&&'SpeechSynthesisUtterance' in window}catch(e){return false}};
+const RATE=.85;
+const FEMALE=/\b(luna|sonia|libby|maisie|hollie|abbi|bella|natasha|jenny|aria|ava|emma|michelle|serena|kate|stephanie|martha|karen|moira|tessa|fiona|samantha|allison|susan|zira|hazel|catherine|nicky|joanna|amy|female)\b/i;
+const MALE=/\b(daniel|arthur|oliver|ryan|thomas|guy|david|mark|george|james|alex|aaron|fred|rishi|wayne|william|liam|brian|eric|christopher|roger|steffan|gordon|jamie|malcolm|tom|lee|evan|nathan|noah|tarun|male)\b/i;
+const NOVELTY=/albert|bad news|bahh|bells|boing|bubbles|cellos|junior|kathy|organ|ralph|trinoids|whisper|wobble|zarvox|superstar|jester|good news|grandma|grandpa|eddy|\bflo\b|\breed\b|rocko|sandy|shelley|espeak/i;
+const NATURAL=/natural|neural|premium|enhanced|siri/i;
+function voiceScore(v){const l=String(v.lang).replace('_','-').toLowerCase();if(!l.startsWith('en'))return -999;
+  let n=5;if(l==='en-sg')n=30;else if(l==='en-gb')n=25;else if(/en-(au|nz|ie)/.test(l))n=20;else if(l==='en-us')n=15;else if(l==='en-in')n=8;
+  if(NOVELTY.test(v.name))n-=200;if(MALE.test(v.name))n-=100;if(FEMALE.test(v.name))n+=90;if(NATURAL.test(v.name))n+=50;else if(/online|google/i.test(v.name))n+=15;return n}
+function voiceList(){if(!canSpeak())return[];try{const en=speechSynthesis.getVoices().filter(v=>voiceScore(v)>-90).sort((a,b)=>voiceScore(b)-voiceScore(a));return en.filter(v=>voiceScore(v)>=0).length?en.filter(v=>voiceScore(v)>=0):en}catch(e){return[]}}
+let lockedVoice=null;
+function pickVoice(){const l=voiceList();if(!l.length)return null;if(S.voice){const m=l.find(v=>v.voiceURI===S.voice);if(m)return lockedVoice=m}
+  if(lockedVoice){const m=l.find(v=>v.voiceURI===lockedVoice.voiceURI);if(m&&(!S.voice||m.voiceURI===S.voice))return lockedVoice=m}return lockedVoice=l[0]}
+/* iPhones can load voices late. Speaking before they arrive falls back to the device default voice, so wait briefly. */
+function whenVoices(cb){const t0=Date.now();(function poll(){if(voiceList().length||Date.now()-t0>1500)cb();else setTimeout(poll,80)})()}
+try{document.addEventListener('click',()=>{try{if(canSpeak()&&!voiceList().length){const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}}catch(e){}},{capture:true,once:true});if(canSpeak())speechSynthesis.getVoices()}catch(e){}
+try{if(canSpeak()&&speechSynthesis.addEventListener)speechSynthesis.addEventListener('voiceschanged',()=>{if(view.name==='parent'&&!reader)render()})}catch(e){}
+
+function tokSpeak(t,next){let m;
+  if(/^\?[,.]?$/.test(t))return next&&/^min/.test(next)?'how many':'what number';
+  if(/^_+[.,]?$/.test(t))return 'blank'+(t.match(/[.,]$/)||[''])[0];if(t==='=')return 'equals';if(t==='+')return 'plus';if(t==='−')return 'minus';if(t==='×')return 'times';if(t===',')return '';
+  if(m=t.match(/^([ap])\.m\.?([,?!]?)$/i))return `${m[1].toUpperCase()} M${m[2]}`;
+  if(t==='h')return 'hour';if(m=t.match(/^min([.,?!]?)$/))return 'minutes'+m[1];if(m=t.match(/^cm([.,?!]?)$/))return 'centimetres'+m[1];
+  if(m=t.match(/^(\d{1,2})\.(\d{2})([.,?!]?)$/)){const mm=+m[2];return (mm===0?`${m[1]} o'clock`:mm<10?`${m[1]} oh ${mm}`:`${m[1]} ${mm}`)+m[3]}
+  if(m=t.match(/^(\d+)c([.,?!]?)$/))return `${m[1]} cents${m[2]}`;
+  if(m=t.match(/^(\d+)(st|nd|rd|th)$/))return ORD[+m[1]]||t;
+  return t}
+const estMs=txt=>(txt.length*72+130)/RATE+(/[.,?!:]$/.test(txt)?200:0);
+function wrapWords(el){if(el.dataset.wrapped)return;el.dataset.wrapped='1';const tw=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);const nodes=[];while(tw.nextNode()){if(!tw.currentNode.parentElement.closest('button'))nodes.push(tw.currentNode)}
+  nodes.forEach(n=>{if(!n.nodeValue.trim())return;const f=document.createDocumentFragment();n.nodeValue.split(/(\s+)/).forEach(part=>{if(!part)return;if(/^\s+$/.test(part)){f.appendChild(document.createTextNode(part));return}const w=document.createElement('span');w.className='w';w.textContent=part;f.appendChild(w)});n.parentNode.replaceChild(f,n)})}
+/* Split an element's words into one utterance per sentence, each with a map from spoken position to word. */
+function wordSeg(el){if(!el)return[];wrapWords(el);const spans=[...el.querySelectorAll('.w')],segs=[];let cur=null;
+  spans.forEach((sp,i)=>{const t=sp.textContent,nx=spans[i+1]&&spans[i+1].textContent,sp2=tokSpeak(t,nx);if(!cur)cur={text:'',map:[],est:0};
+    if(sp2){if(cur.text)cur.text+=' ';cur.map.push({at:cur.text.length,el:sp,ms:estMs(sp2)});cur.text+=sp2;cur.est+=estMs(sp2)}
+    if(/[.!?]$/.test(t)&&!/^[ap]\.m\.$/i.test(t)&&cur.text){segs.push(cur);cur=null}});
+  if(cur&&cur.text)segs.push(cur);return segs}
+function glowSeg(text,el){return{text,map:[],est:estMs(text),glow:el}}
+let reader=null;
+const clearNow=()=>app.querySelectorAll('.w.now').forEach(x=>x.classList.remove('now'));
+function clearLit(){app.querySelectorAll('.lit').forEach(x=>x.classList.remove('lit'))}
+function stopRead(keepLit){const r=reader;reader=null;if(keepLit!==true)clearLit();if(r){r.dead=true;clearTimeout(r.tm);clearTimeout(r.guard);if(r.btn)r.btn.classList.remove('live');if(r.vis)r.vis.classList.remove('talking');app.querySelectorAll('.talking').forEach(x=>x.classList.remove('talking'));clearNow()}try{if(canSpeak())speechSynthesis.cancel()}catch(e){}}
+const hush=stopRead;
+function startRead(segs,btn,vis,cues){let busy=false;try{busy=canSpeak()&&(speechSynthesis.speaking||speechSynthesis.pending)}catch(e){}stopRead();if(!canSpeak()||!segs.length)return;const r=reader={segs,i:0,btn,vis,cues:cues||[],cueAt:0};if(btn)btn.classList.add('live');if(vis)vis.classList.add('talking');
+  const go=()=>{if(!r.dead)whenVoices(()=>playSeg(r))};if(busy)r.tm=setTimeout(go,90);else go()}
+function resolveCue(spec,root){return (Array.isArray(spec)?spec:[spec]).flatMap(x=>{const[base,range]=x.split('@');let n=[...root.querySelectorAll(base)];if(range!==undefined){const[a,b]=range.split('-').map(Number);n=n.slice(a,(b===undefined?a:b)+1)}return n})}
+const normWord=t=>t.replace(/[.,:;!?…]+$/,'').toLowerCase();
+/* Link each cue to the next matching spoken word, in order. Returns one entry per cue; idx -1 means the word was not found. */
+function bindCues(textEl,list,root){const spans=[...textEl.querySelectorAll('.w')];let pos=0;return (list||[]).map(c=>{let idx=-1;for(let i=pos;i<spans.length;i++){if(normWord(spans[i].textContent)===String(c[0]).toLowerCase()){idx=i;pos=i+1;break}}return{span:idx<0?null:spans[idx],idx,only:!!c[2],els:resolveCue(c[1],root),word:c[0]}})}
+function fireCues(r,span){if(!r.cues.length)return;const all=r.spanList||(r.spanList=[...span.parentElement.querySelectorAll('.w')]),at=all.indexOf(span);while(r.cueAt<r.cues.length){const c=r.cues[r.cueAt];if(c.idx<0){r.cueAt++;continue}if(c.idx>at)break;if(c.only)clearLit();c.els.forEach(e=>e.classList.add('lit'));r.cueAt++}}
+function playSeg(r){if(r.dead)return;const seg=r.segs[r.i];if(!seg){stopRead(true);return}clearNow();if(seg.glow)seg.glow.classList.add('talking');
+  let done=false,bound=false,timerOn=false;
+  const show=e=>{clearNow();e.classList.add('now');fireCues(r,e)};
+  const runTimer=()=>{if(timerOn||!seg.map.length)return;timerOn=true;let i=0;const step=()=>{if(r.dead||bound||done)return;show(seg.map[i].el);if(i<seg.map.length-1){const ms=seg.map[i].ms;i++;r.tm=setTimeout(step,ms)}};step()};
+  const next=()=>{if(done||r.dead)return;done=true;clearTimeout(r.tm);clearTimeout(r.guard);if(seg.glow)seg.glow.classList.remove('talking');clearNow();r.i++;r.tm=setTimeout(()=>playSeg(r),140)};
+  try{const u=new SpeechSynthesisUtterance(seg.text);const v=pickVoice();u.lang=v?v.lang:'en-US';if(v)u.voice=v;u.rate=RATE;u.pitch=1;
+    u.onstart=runTimer;
+    u.onboundary=e=>{if(r.dead||done||(e.name&&e.name!=='word'))return;if(!bound){bound=true;clearTimeout(r.tm)}let hit=null;for(const m of seg.map){if(m.at<=e.charIndex)hit=m;else break}if(hit)show(hit.el)};
+    u.onend=next;u.onerror=next;
+    r.guard=setTimeout(next,seg.est*2+5000);
+    setTimeout(()=>{if(!r.dead&&!done)runTimer()},1200);
+    speechSynthesis.speak(u)}catch(e){stopRead()}}
+function qSegs(q){const out=wordSeg(document.getElementById('qtext')),vis=document.querySelector('.play .card > .vis'),sum=vis&&vis.querySelector('.sum');
+  if(sum&&sum.textContent.includes('?'))out.push(...wordSeg(sum));
+  else if(q.say&&q.say!==q.q){const x=q.say.startsWith(q.q)?q.say.slice(q.q.length).trim():q.say;if(x)out.push(glowSeg(x,vis||null))}
+  return out}
+const POP='.rod,.one,.frame i.a,.frame i.b,.frame i.x,.group svg,.tenbox svg,.plate svg,.seg,.moneyrow>svg,.moneyrow>.note,.moneyrow>div,.purse,.graph .rw svg,.iconrow svg,.sum';
+const FADE='.bond>*,.vert>*,.fig .shp';
+function animateVis(root){if(!root)return;const items=[...root.querySelectorAll(POP+','+FADE+',.rul rect:not(.body),.hh,.mh')];const stepMs=Math.min(110,1500/Math.max(items.length,1));
+  items.forEach(e=>e.classList.remove('pop-in','fade-in','grow-x','sweep'));void root.offsetWidth;
+  items.forEach((e,i)=>{const cl=e.matches('.hh,.mh')?'sweep':e.matches('.rul rect')?'grow-x':e.matches(FADE)?'fade-in':'pop-in';e.style.animationDelay=(i*stepMs)+'ms';e.classList.add(cl)})}
+function readLearn(){const btn=app.querySelector('[data-a="read-learn"]'),t=document.getElementById('ltext'),st=SK[view.id].learn[view.i||0],segs=wordSeg(t),root=app.querySelector('.card');startRead(segs,btn,null,bindCues(t,st.c,root))}
+
+/* ---------- views ---------- */
+const app=document.getElementById('app');
+let view={name:'home'},R=null,L=null;
+function go(name,data={}){hush();view={name,...data};render();window.scrollTo(0,0)}
+function render(){const f={home:vHome,station:vStation,learn:vLearn,ride:vRide,done:vDone,parent:vParent}[view.name];stopRead();app.innerHTML=f();if(view.name==='ride')afterRide();if(view.name==='learn'){animateVis(app.querySelector('.card > .vis'));if(S.readLessons)readLearn()}}
+const iconBtn=(act,svg,label,extra='')=>`<button class="iconbtn" data-a="${act}" aria-label="${label}" ${extra}>${svg}</button>`;
+
+function vHome(){const st=S.stamps.length,td=S.stamps.includes(today());
+ return `<div class="mast"><div><p class="eyebrow">Primary 1 · School holidays</p><h1>Holiday Math Line</h1><p style="margin-top:8px">Pick a station. Learn it, practise it and collect stars.</p></div>
+ <div class="ride-card"><h2>${td?'You rode today!':'Today’s ride'}</h2><p>${td?'Your stamp is on the card. You can ride again for more practice.':'10 mixed questions, about 10 minutes. Finish to earn a stamp.'}</p>
+ <button class="btn wide" data-a="daily" id="daily">${td?'Ride again':'Start today’s ride'}</button>
+ <div><div class="stamps" aria-label="${st} of 30 stamps">${Array.from({length:30},(_,i)=>`<span class="stamp ${i<st?'on':''}"></span>`).join('')}</div><p style="font-size:.9rem;margin-top:6px">${st} of 30 stamps · ${totalStars()} of ${maxStars()} stars</p></div></div></div>
+ <ol class="line" aria-label="Math topics">${STATIONS.map(s=>{const got=stnStars(s),max=s.skills.length*3;
+   return `<li class="stn" style="--c:var(${s.c})"><button data-a="stn" data-id="${s.id}"><span class="code">${s.code}</span><span class="nm">${s.name}<span class="pr">${got} of ${max} stars${S.last===s.id?' · last visit':''}</span><span class="bar-mini"><i style="width:${got/max*100}%"></i></span></span></button></li>`}).join('')}</ol>
+ <div class="foot"><a class="textlink" href="./" style="margin-right:14px">All subjects</a><button class="textlink" data-a="parent">Grown-ups: see progress</button></div>`}
+
+function vStation(){const s=STATIONS.find(x=>x.id===view.id);
+ return `<div class="topbar">${iconBtn('home',SVG_BACK,'Back to the map')}<div class="head-stn grow" style="--c:var(${s.c})"><span class="code">${s.code}</span><h1>${s.name}</h1></div></div>
+ <div class="skills">${s.skills.map(k=>{const r=S.sk[k.id]||{s:0};return `<div class="skill"><h3>${k.t}</h3><div class="stars">${stars(r.s)}</div><div class="acts"><button class="btn alt" data-a="learn" data-id="${k.id}">Learn</button><button class="btn" data-a="practice" data-id="${k.id}">Practise</button></div></div>`}).join('')}</div>
+ <div class="mission"><h3>Away from the screen</h3><p>${s.mission}</p></div>`}
+
+function vLearn(){const k=SK[view.id],i=view.i||0,st=k.learn[i],last=i===k.learn.length-1;
+ return `<div class="topbar">${iconBtn('stn-back',SVG_BACK,'Back to the station')}<div class="grow"><p class="eyebrow">${k.st.name} · Learn</p><h2>${k.t}</h2></div>${canSpeak()?iconBtn('read-learn',SVG_SPK,'Read this to me'):''}</div>
+ <div class="card"><p id="ltext" style="font-size:clamp(1.2rem,3.6vw,1.45rem);font-weight:700;line-height:1.3">${st.t}</p>${st.v?`<div class="vis">${st.v}</div>`:''}</div>
+ <div class="row" style="margin-top:14px">${i>0?'<button class="btn alt" data-a="learn-prev">Back</button>':''}${last?`<button class="btn" data-a="practice" data-id="${k.id}">Start practice</button>`:'<button class="btn" data-a="learn-next">Next</button>'}</div>
+ <p style="text-align:center;margin-top:10px;color:var(--muted)">Step ${i+1} of ${k.learn.length}</p>`}
+
+/* ride */
+function genFor(id,seen){let q,tries=0;do{q=G[SK[id].g]();tries++}while(seen&&seen.has(q.q+(q.vis||'')+JSON.stringify(q.a))&&tries<10);if(seen)seen.add(q.q+(q.vis||'')+JSON.stringify(q.a));return{...q,sk:id}}
+function startSkill(id){S.last=SK[id].st.id;const seen=new Set();const qs=Array.from({length:8},()=>genFor(id,seen));R={mode:'skill',id,title:SK[id].t,color:SK[id].st.c,items:qs,seen,i:0,first:0,base:8,extra:0,results:[]};beginQ();go('ride')}
+function startDaily(){const ids=Object.keys(SK);const w=ids.map(id=>{const r=S.sk[id];if(!r||!r.n)return 2;return 1+3*(1-r.r/r.n)});const chosen=[];const pool=[...ids];const pw=[...w];for(let n=0;n<10&&pool.length;n++){let t=pw.reduce((a,b)=>a+b,0),x=Math.random()*t,j=0;while(x>pw[j]){x-=pw[j];j++}chosen.push(pool[j]);pool.splice(j,1);pw.splice(j,1)}
+ const seen=new Set();R={mode:'daily',title:'Today’s ride',color:'--blue',items:chosen.map(id=>genFor(id,seen)),seen,i:0,first:0,base:10,extra:0,results:[]};beginQ();go('ride')}
+function beginQ(){R.tries=0;R.state='ask';R.buf='';R.msg='';const q=R.items[R.i];R.inp={};
+ if(q.kind==='build')R.inp={t:0,o:0};if(q.kind==='money')R.inp={tray:[]};if(q.kind==='clock'){let h=ri(1,12);R.inp={h,m:0}}if(q.kind==='order')R.inp={seq:[]};if(q.deal)R.inp={given:0}}
+function vRide(){const q=R.items[R.i],n=R.items.length;const pos=R.i/(n-1||1)*100;
+ const stops=R.items.map((_,i)=>`<span class="stop ${i<R.i?(R.results[i]?'done':'miss'):''}"></span>`).join('');
+ let visBlock=q.vis||'';
+ if(q.deal){const {t,k,it}=q.deal,g=R.inp.given,each=Array(k).fill(0).map((_,i)=>Math.floor(g/k)+(i<g%k?1:0));visBlock=`<div>${plates(each,it)}</div><p>${t-g} left to share</p>${g<t?'<button class="btn alt" data-a="deal">Give one to each plate</button>':''}`}
+ if(q.kind==='clock')visBlock=clock(R.inp.h,R.inp.m);
+ if(q.kind==='tapicon')visBlock='';
+ const hintVis=q.hv?`<div class="vis">${q.hv}</div>`:'';const fbBox=(cl,txt,v='')=>`<div class="feedback ${cl}"><div class="fbrow"><span id="fbtext">${txt}</span>${canSpeak()?`<button class="iconbtn" data-a="read-fb" aria-label="Read this to me">${SVG_SPK}</button>`:''}</div>${v}</div>`;
+ let fb='';if(R.state==='retry')fb=fbBox('no shake',`<b>Not yet.</b> ${R.msg||''} Try once more. <b style="color:var(--ink)">Hint:</b> ${q.hint}`,hintVis);
+ if(R.state==='hint')fb=fbBox('hint',`<b>Hint:</b> ${q.hint}`,hintVis);
+ if(R.state==='right')fb=fbBox('ok',`<b>Correct!</b> ${q.why}`);
+ if(R.state==='shown')fb=fbBox('no',`<b>The answer is ${showAns(q)}.</b> ${q.why}`);
+ return `<div class="topbar">${iconBtn('quit',SVG_X,'Stop this ride')}<div class="grow"><p class="eyebrow">${R.mode==='daily'?SK[q.sk].st.name:SK[q.sk].st.name}</p><h2 style="font-size:1.25rem">${R.title}</h2></div></div>
+ <div class="track" style="--c:var(${R.color})">${stops}${TRAIN.replace('id="train"',`id="train" style="left:${R.prevPos??pos}%"`)}</div>
+ <div class="play"><div class="card"><div class="prompt"><p id="qtext">${q.q}</p>${canSpeak()?`<button class="iconbtn" data-a="read" aria-label="Read the question to me">${SVG_SPK}</button>`:''}</div>${visBlock?`<div class="vis">${visBlock}</div>`:''}${q.kind==='tapicon'?`<div class="vis">${iconRow(q)}</div>`:''}${fb}</div>
+ <div class="tools">${inputUI(q)}${R.state==='ask'&&!R.tries?'<button class="textlink" data-a="hint" style="justify-self:center">I need a hint</button>':''}</div></div>`}
+function afterRide(){const tr=document.getElementById('train');const n=R.items.length,pos=R.i/(n-1||1)*100;if(tr&&R.prevPos!==pos){requestAnimationFrame(()=>requestAnimationFrame(()=>{tr.style.left=pos+'%'}));R.prevPos=pos}
+ if(S.autoRead&&R.state==='ask'&&!R.spoken){R.spoken=true;startRead(qSegs(R.items[R.i]),app.querySelector('[data-a="read"]'))}}
+function showAns(q){if(q.kind==='clock')return tf(q.a.h,q.a.m);if(q.kind==='order')return q.a.join(', ');if(q.kind==='tapicon')return `picture ${q.a+1}`;if(q.kind==='money')return q.unit==='$'?'$'+q.a:q.a+'c';if(q.kind==='choice'){const c=q.choices.find(x=>x.v===q.a);return /<svg/.test(c.l)?'marked in green':c.l.replace(/<[^>]+>/g,'')}
+ return `${q.pre||''}${q.a}${q.suf?(/^(c)$/.test(q.suf)?'':' ')+q.suf:''}`}
+function iconRow(q){const fin=R.state==='right'||R.state==='shown';return `<div class="iconrow">${q.row.map((k,i)=>`<button data-a="tap" data-v="${i}" aria-label="${ICONS[k].n}" class="${fin&&i===q.a?'right':''} ${R.inp.wrong===i?'wrong':''}" ${fin?'disabled':''}>${ic(k)}</button>`).join('')}</div>`}
+function inputUI(q){const fin=R.state==='right'||R.state==='shown';const next=`<button class="btn wide" data-a="next" id="nextbtn">${R.i===R.items.length-1?'Finish':'Next stop'}</button>`;
+ if(q.kind==='num'){const box=`<div class="ansbox ${fin&&R.state==='right'?'':''}">${q.pre?`<span>${q.pre}</span>`:''}<span class="blank" id="buf">${fin?q.a:R.buf||'&nbsp;'}</span>${q.suf?`<span style="font-size:1.3rem">${q.suf}</span>`:''}</div>`;
+  if(fin)return box+next;return `<div class="pad">${box}${[1,2,3,4,5,6,7,8,9].map(n=>`<button class="key" data-a="k" data-v="${n}">${n}</button>`).join('')}<button class="key" data-a="del" aria-label="Delete">⌫</button><button class="key" data-a="k" data-v="0">0</button><button class="key go" data-a="check">Check</button></div>`}
+ if(q.kind==='choice'){return `<div class="choices" ${q.choices.length<=2?'style="grid-template-columns:1fr 1fr"':''}>${q.choices.map(c=>`<button class="choice ${fin&&c.v===q.a?'right':''} ${(R.inp.wrong||[]).includes(c.v)?'wrong':''}" data-a="choice" data-v="${q.choices.indexOf(c)}" ${fin?'disabled':''}>${c.l}</button>`).join('')}</div>${fin?next:''}`}
+ if(q.kind==='tapicon')return fin?next:'<p style="text-align:center;color:var(--muted)">Tap a picture in the row.</p>';
+ if(q.kind==='build'){const{t,o}=R.inp;const stepper=(lab,v,minus,plus)=>`<div class="stepper"><button data-a="${minus}" aria-label="Remove ${lab}">−</button><span>${v} ${lab}</span><button data-a="${plus}" aria-label="Add ${lab}">+</button></div>`;
+  return `<div class="card"><div class="vis" style="margin-top:0;min-height:100px">${rods(t,o)||''}</div></div>${fin?'':stepper('tens',t,'t-','t+')+stepper('ones',o,'o-','o+')+'<button class="btn wide" data-a="check">Check</button>'}${fin?next:''}`}
+ if(q.kind==='money'){const isC=q.unit==='c',one=v=>isC?coin(v,1.3):note(v);
+  return `<div class="tray" aria-label="Tray">${R.inp.tray.length?R.inp.tray.map((v,i)=>`<button data-a="rm" data-v="${i}" aria-label="Take out" ${fin?'disabled':''}>${one(v)}</button>`).join(''):'Tray is empty'}</div>${fin?next:`<div class="bank">${q.bank.map(v=>`<button data-a="addm" data-v="${v}" aria-label="Add">${one(v)}</button>`).join('')}</div><button class="btn wide" data-a="check">Check</button>`}`}
+ if(q.kind==='clock'){return fin?next:`<div class="stepper"><button data-a="m-" aria-label="5 minutes back">−</button><span>Minutes</span><button data-a="m+" aria-label="5 minutes forward">+</button></div><div class="stepper"><button data-a="h-" aria-label="1 hour back">−</button><span>Hour</span><button data-a="h+" aria-label="1 hour forward">+</button></div><button class="btn wide" data-a="check">Check</button>`}
+ if(q.kind==='order'){const seq=R.inp.seq;return `<div class="slots">${q.a.map((_,i)=>`<span class="slot ${seq[i]!==undefined?'fill':''}">${fin?q.a[i]:seq[i]??''}</span>`).join('')}</div>${fin?next:`<div class="slots">${q.nums.map(n=>`<button class="chip" data-a="ord" data-v="${n}" ${seq.includes(n)?'disabled':''}>${n}</button>`).join('')}</div><div class="row"><button class="btn alt" data-a="ord-clear">Clear</button><button class="btn" data-a="check" ${seq.length<q.a.length?'disabled style="opacity:.5"':''}>Check</button></div>`}`}
+ return ''}
+function submit(val){const q=R.items[R.i];if(R.state==='right'||R.state==='shown')return;
+ let ok=false,msg='';
+ if(q.kind==='num'){if(!R.buf)return;ok=Number(R.buf)===q.a}
+ if(q.kind==='choice'){ok=val===q.a;if(!ok)(R.inp.wrong=R.inp.wrong||[]).push(val)}
+ if(q.kind==='tapicon'){ok=val===q.a;if(!ok)R.inp.wrong=val}
+ if(q.kind==='build'){ok=R.inp.t*10+R.inp.o===q.a;if(!ok)msg=`You made ${R.inp.t*10+R.inp.o}.`}
+ if(q.kind==='money'){const s=R.inp.tray.reduce((a,b)=>a+b,0);ok=s===q.a;if(!ok)msg=`You made ${q.unit==='$'?'$'+s:s+'c'}.`}
+ if(q.kind==='clock'){ok=R.inp.h===q.a.h&&R.inp.m===q.a.m;if(!ok)msg=`The clock shows ${tf(R.inp.h,R.inp.m)}.`}
+ if(q.kind==='order'){if(R.inp.seq.length<q.a.length)return;ok=R.inp.seq.every((v,i)=>v===q.a[i]);if(!ok)R.inp.seq=[]}
+ R.tries++;
+ if(ok){R.state='right';sfx.ok();finishQ(R.tries===1)}
+ else if(R.tries===1){R.state='retry';R.msg=msg;R.buf='';sfx.no()}
+ else{R.state='shown';sfx.no();finishQ(false);if(R.extra<2&&R.i>=0){R.items.push(genFor(q.sk,R.seen));R.extra++}}
+ render()}
+function finishQ(firstTry){const inBase=R.i<R.base;const r=rec(R.items[R.i].sk);r.n++;if(firstTry)r.r++;R.results[R.i]=firstTry;if(firstTry&&inBase)R.first++;}
+function nextQ(){hush();R.spoken=false;if(R.i>=R.items.length-1){finishRide();return}R.i++;beginQ();render();window.scrollTo(0,0)}
+function finishRide(){let gained=null;const score=R.first,base=R.base;const s=score>=base-1?3:score>=Math.ceil(base*.6)?2:1;
+ if(R.mode==='skill'){const r=rec(R.id);gained=s;if(s>r.s)r.s=s}else if(!S.stamps.includes(today()))S.stamps.push(today());save();sfx.end();go('done',{s,score,base,mode:R.mode,id:R.id})}
+function vDone(){const{s,score,base,mode,id}=view;const msg=score===base?'Perfect ride! Every answer right on the first try.':`${score} of ${base} right on the first try.`;const k=mode==='skill'?SK[id]:null;let nextSk=null;if(k){const list=k.st.skills,i=list.findIndex(x=>x.id===id);nextSk=list[i+1]}
+ return `<div class="card done-card"><p class="eyebrow">Last stop</p><h1>You arrived!</h1><div>${star(s>=1,1)}${star(s>=2,1)}${star(s>=3,1)}</div><p style="font-size:1.2rem">${msg}</p>${mode==='daily'?`<p>Stamp collected. You have ${S.stamps.length} of 30.</p>`:s<3?'<p>Ride again to earn more stars.</p>':''}
+ <div class="row">${k?`<button class="btn alt" data-a="practice" data-id="${id}">Ride again</button>`:''}${nextSk?`<button class="btn" data-a="learn" data-id="${nextSk.id}">Next: ${nextSk.t}</button>`:''}<button class="btn ${nextSk?'alt':''}" data-a="${k?'stn-back':'home'}">${k?'Back to station':'Back to the map'}</button></div></div>`}
+function vParent(){const rows=STATIONS.map(s=>{let n=0,r=0;s.skills.forEach(k=>{const x=S.sk[k.id];if(x){n+=x.n;r+=x.r}});return{s,n,r}});
+ const weak=Object.keys(SK).map(id=>({id,x:S.sk[id]})).filter(o=>o.x&&o.x.n>=4&&o.x.r/o.x.n<.7).sort((a,b)=>a.x.r/a.x.n-b.x.r/b.x.n);
+ return `<div class="parent"><div class="topbar">${iconBtn('home',SVG_BACK,'Back to the map')}<div class="grow"><p class="eyebrow">For grown-ups</p><h1 style="font-size:1.8rem">Progress</h1></div></div>
+ <p>${S.stamps.length} stamps · ${totalStars()} of ${maxStars()} stars · saved ${syncState==='account'?'to your Claude account and this device':'on this device only'}.</p>
+ <h2>Needs more practice</h2>${weak.length?`<div class="wrapx"><table class="tbl"><tr><th>Skill</th><th>Station</th><th>First-try score</th></tr>${weak.map(o=>`<tr><td>${SK[o.id].t}</td><td>${SK[o.id].st.name}</td><td>${o.x.r} of ${o.x.n}</td></tr>`).join('')}</table></div>`:'<p>Nothing yet. Skills show here when the first-try score is under 70% after at least 4 questions.</p>'}
+ <h2>All stations</h2><div class="wrapx"><table class="tbl"><tr><th>Station</th><th>Stars</th><th>First-try score</th></tr>${rows.map(o=>`<tr><td>${o.s.code} ${o.s.name}</td><td>${stnStars(o.s)} of ${o.s.skills.length*3}</td><td>${o.n?`${o.r} of ${o.n}`:'Not started'}</td></tr>`).join('')}</table></div>
+ <h2>Settings</h2><p><label style="display:flex;gap:10px;align-items:center;min-height:44px"><input type="checkbox" id="autoread" ${S.autoRead?'checked':''}> Read each question aloud automatically</label><label style="display:flex;gap:10px;align-items:center;min-height:44px"><input type="checkbox" id="soundfx" ${S.sound?'checked':''}> Play sounds for right and wrong answers</label></p>
+ ${canSpeak()?`<h2>Reading voice</h2><p><label style="display:flex;gap:10px;align-items:center;min-height:44px"><input type="checkbox" id="readlessons" ${S.readLessons?'checked':''}> Read lessons aloud automatically</label></p>
+ <div class="row" style="justify-content:flex-start;align-items:center"><select id="voicepick" aria-label="Reading voice" style="min-height:48px;max-width:100%;font:inherit;padding:6px 8px;border-radius:10px;background:var(--surface);color:var(--ink);border:1px solid var(--hair)"><option value="">Best available</option>${voiceList().map(v=>`<option value="${v.voiceURI.replace(/"/g,'&quot;')}" ${v.voiceURI===S.voice?'selected':''}>${v.name.replace(/</g,'&lt;')}</option>`).join('')}</select><button class="btn alt" data-a="voice-test">Test voice</button></div>
+ <p id="vtest" style="margin-top:8px">Hello! Let us count together: 10, 20, 30.</p>
+ <p style="margin-top:8px"><b>Now using:</b> ${(()=>{const v=pickVoice();return v?v.name.replace(/</g,'&lt;'):'the device’s default voice, because this app cannot see the voice list'})()}</p>
+ <p style="margin-top:8px;color:var(--muted)">Voices come from this device. If they all sound robotic, add an enhanced English voice in the device’s speech settings, then pick it here.</p>`:''}
+ <h2>How it works</h2><p>Questions are freshly generated, so each ride is different. A wrong answer gets a hint and a second try. If it is still wrong, the answer and method are shown and a similar question is added at the end. Stars count first-try answers only. Today’s ride gives more questions from weaker skills.</p>
+ <p style="margin-top:8px">Topics follow what Singapore schools publish for the current P1 syllabus: whole numbers to 100, addition and subtraction, multiplication within 40, division within 20, money, length in cm, time to 5 minutes, 2D shapes and picture graphs.</p>
+ <h2>Start over</h2>${view.confirm?`<p>This clears all stars, stamps and scores.</p><div class="row" style="justify-content:flex-start;margin-top:8px"><button class="btn" data-a="reset-yes">Yes, clear everything</button><button class="btn alt" data-a="reset-no">Keep progress</button></div>`:`<button class="btn alt danger" data-a="reset">Clear progress</button>`}</div>`}
+
+/* ---------- events ---------- */
+app.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const a=b.dataset.a,id=b.dataset.id,v=b.dataset.v;
+ const q=R&&R.items[R.i];
+ const clampUI=()=>render();
+ switch(a){
+  case 'home':go('home');break;
+  case 'parent':go('parent');break;
+  case 'stn':S.last=id;go('station',{id});break;
+  case 'stn-back':go('station',{id:view.id?SK[view.id]?SK[view.id].st.id:view.id:STATIONS[0].id});break;
+  case 'learn':go('learn',{id,i:0});break;
+  case 'learn-next':view.i++;hush();render();window.scrollTo(0,0);break;
+  case 'learn-prev':view.i--;hush();render();break;
+  case 'read-learn':if(reader&&reader.btn===b)stopRead();else{animateVis(app.querySelector('.card > .vis'));readLearn()}break;
+  case 'practice':startSkill(id);break;
+  case 'daily':startDaily();break;
+  case 'quit':go(R.mode==='skill'?'station':'home',{id:R.mode==='skill'?SK[R.id].st.id:undefined});break;
+  case 'read':if(reader&&reader.btn===b)stopRead();else startRead(qSegs(q),b);break;
+  case 'read-fb':if(reader&&reader.btn===b)stopRead();else startRead(wordSeg(document.getElementById('fbtext')),b);break;
+  case 'voice-test':startRead(wordSeg(document.getElementById('vtest')),b);break;
+  case 'hint':R.state='hint';render();break;
+  case 'k':if(R.buf.length<3){R.buf+=v;if(R.state==='retry'||R.state==='hint'){}const el=document.getElementById('buf');if(el)el.textContent=R.buf}break;
+  case 'del':R.buf=R.buf.slice(0,-1);{const el=document.getElementById('buf');if(el)el.innerHTML=R.buf||'&nbsp;'}break;
+  case 'check':submit();break;
+  case 'choice':submit(q.choices[Number(v)].v);break;
+  case 'tap':submit(Number(v));break;
+  case 'next':nextQ();break;
+  case 'deal':R.inp.given=Math.min(q.deal.t,R.inp.given+q.deal.k);render();break;
+  case 't+':if(R.inp.t<10){R.inp.t++;clampUI()}break;
+  case 't-':if(R.inp.t>0){R.inp.t--;clampUI()}break;
+  case 'o+':if(R.inp.o<9){R.inp.o++;clampUI()}break;
+  case 'o-':if(R.inp.o>0){R.inp.o--;clampUI()}break;
+  case 'addm':if(R.inp.tray.length<12){R.inp.tray.push(Number(v));R.inp.tray.sort((x,y)=>y-x);clampUI()}break;
+  case 'rm':R.inp.tray.splice(Number(v),1);clampUI();break;
+  case 'm+':R.inp.m+=5;if(R.inp.m>=60){R.inp.m=0;R.inp.h=hw(R.inp.h+1)}clampUI();break;
+  case 'm-':R.inp.m-=5;if(R.inp.m<0){R.inp.m=55;R.inp.h=hw(R.inp.h-1)}clampUI();break;
+  case 'h+':R.inp.h=hw(R.inp.h+1);clampUI();break;
+  case 'h-':R.inp.h=hw(R.inp.h-1);clampUI();break;
+  case 'ord':R.inp.seq.push(Number(v));clampUI();break;
+  case 'ord-clear':R.inp.seq=[];clampUI();break;
+  case 'reset':view.confirm=true;render();break;
+  case 'reset-no':view.confirm=false;render();break;
+  case 'reset-yes':{const snd=S.sound;S=blank();S.sound=snd;save();view.confirm=false;render();break}
+ }});
+app.addEventListener('change',e=>{if(e.target.id==='autoread'){S.autoRead=e.target.checked;save()}if(e.target.id==='soundfx'){S.sound=e.target.checked;save()}if(e.target.id==='readlessons'){S.readLessons=e.target.checked;save()}if(e.target.id==='voicepick'){S.voice=e.target.value;lockedVoice=null;save();render()}});
+document.addEventListener('keydown',e=>{if(view.name!=='ride'||!R)return;const q=R.items[R.i];
+ if(e.key==='Enter'){const n=document.getElementById('nextbtn');if(n){e.preventDefault();nextQ();return}if(q.kind==='num'&&R.buf){e.preventDefault();submit()}return}
+ if(q.kind!=='num'||R.state==='right'||R.state==='shown')return;
+ if(/^[0-9]$/.test(e.key)&&R.buf.length<3){R.buf+=e.key;const el=document.getElementById('buf');if(el)el.textContent=R.buf}
+ if(e.key==='Backspace'){R.buf=R.buf.slice(0,-1);const el=document.getElementById('buf');if(el)el.innerHTML=R.buf||'&nbsp;'}});
+
+render();
+initDb();
+</script>
+
+</body></html>
