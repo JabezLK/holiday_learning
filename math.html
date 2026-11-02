@@ -223,7 +223,7 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .danger{color:var(--no)}
 /* Read-along */
 .w{display:inline-block;border-radius:6px}
-.w.now{background:var(--star);color:#231a00;box-shadow:0 0 0 3px var(--star)}
+.w.now{background:var(--star);color:#231a00}
 .iconbtn.live{background:var(--star);color:#231a00;animation:speak 1s ease-in-out infinite}
 @keyframes speak{50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--star) 35%,transparent)}}
 .vis.talking,.talking{border-radius:14px;background:var(--hintbg);box-shadow:0 0 0 6px var(--hintbg)}
@@ -649,19 +649,19 @@ function fireCues(r,span){if(!r.cues.length)return;const all=r.spanList||(r.span
 const PACE_LS='p1-math-pace';let paceAll={};try{paceAll=JSON.parse(localStorage.getItem(PACE_LS)||'{}')}catch(e){}
 const paceKey=()=>{const v=pickVoice();return v?v.voiceURI:'default'};
 const getPace=()=>paceAll[paceKey()]||1;
-function setPace(x){if(!(x>0))return;paceAll[paceKey()]=Math.min(1.8,Math.max(.4,getPace()*.6+x*.4));try{localStorage.setItem(PACE_LS,JSON.stringify(paceAll))}catch(e){}}
+function setPace(x){if(!(x>0))return;const k=paceKey(),old=paceAll[k];paceAll[k]=Math.min(1.8,Math.max(.3,old?old*.5+x*.5:x));try{localStorage.setItem(PACE_LS,JSON.stringify(paceAll))}catch(e){}}
 function playSeg(r){if(r.dead)return;const seg=r.segs[r.i];if(!seg){stopRead(true);return}clearNow();if(seg.glow)seg.glow.classList.add('talking');
-  const map=seg.map;let done=false,started=false,idx=-1,cur=null,startT=0,last=null,sawBound=false;
-  const show=m=>{if(cur)cur.classList.remove('now');cur=m.el;cur.classList.add('now');fireCues(r,cur)};
+  const map=seg.map;let done=false,started=false,idx=-1,cur=null,startT=0,last=null,sawBound=false,shownAt=0;
+  const show=m=>{if(cur)cur.classList.remove('now');cur=m.el;shownAt=performance.now();cur.classList.add('now');fireCues(r,cur)};
   const sum=(a,b)=>{let t=0;for(let i=a;i<b;i++)t+=map[i].ms;return t};
   const advance=()=>{if(r.dead||done)return;if(idx<map.length-1){idx++;show(map[idx]);if(idx<map.length-1)r.tm=setTimeout(advance,map[idx].ms*getPace())}};
   const begin=()=>{if(started)return;started=true;startT=performance.now();if(map.length)advance()};
-  const next=()=>{if(done||r.dead)return;done=true;clearTimeout(r.tm);clearTimeout(r.guard);if(started&&map.length>2&&!sawBound)setPace((performance.now()-startT)/seg.est);if(seg.glow)seg.glow.classList.remove('talking');if(cur)cur.classList.remove('now');r.i++;r.tm=setTimeout(()=>playSeg(r),140)};
+  const next=()=>{if(done||r.dead)return;done=true;clearTimeout(r.tm);clearTimeout(r.guard);if(started&&map.length>2)setPace((performance.now()-startT)/seg.est);if(seg.glow)seg.glow.classList.remove('talking');if(cur)cur.classList.remove('now');r.i++;r.tm=setTimeout(()=>playSeg(r),140)};
   try{const u=new SpeechSynthesisUtterance(seg.text);const v=pickVoice();u.lang=v?v.lang:'en-US';if(v)u.voice=v;u.rate=RATE;u.pitch=1;
     u.onstart=begin;
     u.onboundary=e=>{if(r.dead||done||!map.length||(e.name&&e.name!=='word'))return;begin();sawBound=true;let h=0;map.forEach((m,i)=>{if(m.at<=e.charIndex)h=i});const now=performance.now();
-      if(last&&h>last.i)setPace((now-last.t)/sum(last.i,h));last={t:now,i:h};clearTimeout(r.tm);
-      if(h>=idx){if(h>idx){idx=h;show(map[idx])}if(idx<map.length-1)r.tm=setTimeout(advance,map[idx].ms*getPace())}
+      last={t:now,i:h};clearTimeout(r.tm);
+      if(h>=idx){const go=()=>{if(r.dead||done)return;if(h>idx){idx=h;show(map[idx])}if(idx<map.length-1)r.tm=setTimeout(advance,map[idx].ms*getPace())};const wait=h>idx?130-(now-shownAt):0;if(wait>0)r.tm=setTimeout(go,wait);else go()}
       else if(idx<map.length-1)r.tm=setTimeout(advance,sum(h,idx+1)*getPace())};
     u.onend=next;u.onerror=next;r.guard=setTimeout(next,seg.est*2.5+5000);setTimeout(()=>{if(!r.dead&&!done)begin()},1200);speechSynthesis.speak(u)}catch(e){stopRead()}}
 function qSegs(q){const out=wordSeg(document.getElementById('qtext')),vis=document.querySelector('.play .card > .vis'),sum=vis&&vis.querySelector('.sum');
